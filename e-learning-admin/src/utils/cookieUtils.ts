@@ -1,5 +1,5 @@
-const TOKEN_COOKIE_NAME = "token";
-const REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
+const TOKEN_COOKIE_NAME = "tk_oc";
+const REFRESH_TOKEN_COOKIE_NAME = "rftk_oc";
 
 export const setTokenCookie = (token: string) => {
     const expirationTime = 1 * 60 * 60 * 1000; // 1 hour

@@ -18,4 +18,12 @@ export const signUp = async (req: SignUpReq): Promise<void> => {
     }
 }
 
-export default { login, signUp }
+export const logout = async (): Promise<void> => {
+    try {
+        await axiosInstance.post('/auth/logout')
+    } catch (error) {
+        throw new Error(`${error}`)
+    }
+}
+
+export default { login, signUp, logout }

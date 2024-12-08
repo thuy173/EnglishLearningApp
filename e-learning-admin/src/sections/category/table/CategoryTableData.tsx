@@ -4,21 +4,22 @@ import { PageResponse } from '@/models/common/pageResponse'
 import { Button } from '@/components/ui/button'
 import { PencilLineIcon } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
-import { cn } from '@/lib/utils'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import EmptyData from '@/components/common/EmptyData'
 import { toast } from 'sonner'
-import { CategoryRes } from '@/models/category'
+import { CategoryReq, CategoryRes } from '@/models/category'
 import categoryService from '@/services/categoryService'
 import CategoryForm from '../form/CategoryForm'
 import DeleteOneAlertDialog from '@/components/dialog/DeleteOneAlertDialog'
 import DeleteManyDialog from '@/components/dialog/DeleteManyDialog'
-import { getActiveStatusStyles, getActiveStatusText } from '@/utils/getStatusStyle'
 import TableSkeleton from '@/components/table/TableSkeleton'
 import { handleError } from '@/utils/handleError'
 import { createSortHandlers, SortState } from '@/utils/tableSortUtils'
 import { CommonSortField } from '@/enums/sort-field/commonSortField'
 import SearchField from '@/components/common/SearchField'
+import { SortDirection } from '@/enums/sortDirection'
+import UpdateStatusForm from '@/components/form/UpdateStatusForm'
+import Picture from '@/components/common/Picture'
 
 type CategoryTableDataProps = {
     fetching: boolean;
@@ -27,6 +28,7 @@ type CategoryTableDataProps = {
     searchKey: string;
     setSearchKey: (key: string) => void;
     setSelectedSortField: (orderBy: CommonSortField) => void;
+    setSelectedSortDir: (sortDir: SortDirection) => void;
 }
 
 const CategoryTableData: React.FC<CategoryTableDataProps> = ({
@@ -36,9 +38,11 @@ const CategoryTableData: React.FC<CategoryTableDataProps> = ({
     searchKey,
     setSearchKey,
     setSelectedSortField,
+    setSelectedSortDir,
 }) => {
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const [loadingDelete, setLoadingDelete] = useState<{ [key: number]: boolean }>({});
+    const [loadingStatus, setLoadingStatus] = useState<{ [key: number]: boolean }>({});
     const isAllSelected = selectedIds.length === data.content?.length;
     const [selectedItem, setSelectedItem] = React.useState<CategoryRes>({} as CategoryRes);
     const [openDialogs, setOpenDialogs] = useState<{ [key: number]: boolean }>({});
@@ -50,7 +54,8 @@ const CategoryTableData: React.FC<CategoryTableDataProps> = ({
 
     const { handleSort, getSortIndicator } = createSortHandlers<CommonSortField>(
         setSortState,
-        setSelectedSortField
+        setSelectedSortField,
+        setSelectedSortDir
     );
 
     const toggleSelectAll = () => {
@@ -115,6 +120,38 @@ const CategoryTableData: React.FC<CategoryTableDataProps> = ({
         setOpenDialogs(prev => ({ ...prev, [id]: false }));
     };
 
+    const handleUpdateStatus = async (item: CategoryRes, newStatus: boolean) => {
+        try {
+            setLoadingStatus(prev => ({ ...prev, [item.id]: true }))
+            const req: CategoryReq = {
+                name: item.name,
+                icon: '',
+                description: item.description,
+                status: newStatus
+            }
+
+            const response = await categoryService.updateCategory(item.id, req)
+            const updatedItem = response;
+            const index = data.content.findIndex((item) => item.id === item.id);
+
+            if (index >= 0) {
+                const updatedItems = [...data.content];
+                updatedItems[index] = { ...updatedItems[index], ...updatedItem };
+
+                setData({
+                    ...data,
+                    content: updatedItems,
+                });
+            }
+
+            toast.success('Update status successfully')
+        } catch (error) {
+            handleError(error, 'Failed to update status')
+        } finally {
+            setLoadingStatus(prev => ({ ...prev, [item.id]: false }))
+        }
+    }
+
     return (
         <>
             {selectedIds.length > 0 ? (
@@ -139,11 +176,16 @@ const CategoryTableData: React.FC<CategoryTableDataProps> = ({
                                     aria-label='Select all'
                                 />
                             </TableHead>
-                            <TableHead onClick={() => handleSort(CommonSortField.NAME, CommonSortField.NAME, CommonSortField.NAME)}>
+                            <TableHead onClick={() => handleSort(CommonSortField.NAME)}>
                                 Name {getSortIndicator(CommonSortField.NAME, sortState)}
                             </TableHead>
+                            <TableHead>Icon</TableHead>
                             <TableHead>Description</TableHead>
-                            <TableHead className='text-center'>Status</TableHead>
+                            <TableHead className='text-end'
+                                onClick={() => handleSort(CommonSortField.STATUS)}
+                            >
+                                Status {getSortIndicator(CommonSortField.STATUS, sortState)}
+                            </TableHead>
                             <TableHead />
                         </TableRow>
                     </TableHeader>
@@ -158,21 +200,23 @@ const CategoryTableData: React.FC<CategoryTableDataProps> = ({
                                     />
                                 </TableCell>
                                 <TableCell>{item.name}</TableCell>
-                                <TableCell>{item.description}</TableCell>
-                                <TableCell className="text-center">
-                                    <span className={cn('px-2 py-1 rounded-md text-xs text-nowrap font-semibold',
-                                        getActiveStatusStyles(item.status))}
-                                    >
-                                        {getActiveStatusText(item.status)}
-                                    </span>
+                                <TableCell>
+                                    <Picture src={item.icon} alt={item.name} className='size-12 object-cover' />
                                 </TableCell>
-                                <TableCell className='flex justify-center space-x-1 text-center'>
+                                <TableCell>{item.description}</TableCell>
+                                <TableCell className="text-end">
+                                    <UpdateStatusForm
+                                        status={item.status}
+                                        onStatusUpdate={(newStatus: boolean) => handleUpdateStatus(item, newStatus)}
+                                        loading={loadingStatus[item.id]}
+                                    />
+                                </TableCell>
+                                <TableCell className='space-x-1 text-end'>
                                     <Dialog open={openDialogs[item.id]} onOpenChange={(open) => setOpenDialogs(prev => ({ ...prev, [item.id]: open }))}>
                                         <DialogTrigger asChild>
                                             <Button
                                                 size="icon"
                                                 variant='outline'
-                                                className="gap-3 px-3 justify-start"
                                                 onClick={() => handleEditClick(item)}
                                                 title='Update'
                                             >

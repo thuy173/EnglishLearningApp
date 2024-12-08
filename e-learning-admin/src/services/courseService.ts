@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { CommonSortField } from "@/enums/sort-field/commonSortField";
 import { PageResponse } from "@/models/common/pageResponse";
-import { CourseReq, CourseRes } from "@/models/course";
+import { CourseReq, CourseRes, CourseShortRes } from "@/models/course";
 import { CommonParam } from "@/types/commonParam";
 import axiosInstance from "./agent";
 
 interface CourseParams extends CommonParam {
-    name: string;
-    sortField: CommonSortField;
+    name?: string;
+    sortField?: CommonSortField;
 }
 
 export const getAllCourses = async ({
@@ -16,7 +16,7 @@ export const getAllCourses = async ({
     pageSize,
     sortField,
     sortDirection
-}: CourseParams): Promise<PageResponse<CourseRes>> => {
+}: CourseParams): Promise<PageResponse<CourseShortRes>> => {
     try {
         const params: Record<string, string | number | undefined> = {};
         if (name) params.name = name
@@ -48,15 +48,15 @@ export const addCourse = async (req: CourseReq): Promise<void> => {
         const formData = new FormData()
 
         formData.append('name', req.name)
-        formData.append('name', req.description)
-        formData.append('name', req.audience)
-        formData.append('name', req.target)
-        formData.append('name', req.content)
-        formData.append('name', req.thumbnail)
-        formData.append('name', req.price.toString())
-        formData.append('name', req.status.toString())
-        formData.append('name', req.categoryId.toString())
-        formData.append('name', req.levelId.toString())
+        formData.append('description', req.description)
+        formData.append('audience', req.audience)
+        formData.append('target', req.target)
+        formData.append('content', req.content)
+        formData.append('thumbnail', req.thumbnail)
+        formData.append('price', req.price.toString())
+        formData.append('status', req.status.toString())
+        formData.append('categoryId', req.categoryId.toString())
+        formData.append('levelId', req.levelId.toString())
 
         const config = {
             headers: {
@@ -73,7 +73,29 @@ export const addCourse = async (req: CourseReq): Promise<void> => {
 
 export const updateCourse = async (id: number, req: CourseReq): Promise<void> => {
     try {
-        const response = await axiosInstance.put(`/courses/${id}`, req)
+        const formData = new FormData()
+
+        formData.append('name', req.name)
+        formData.append('description', req.description)
+        formData.append('audience', req.audience)
+        formData.append('target', req.target)
+        formData.append('content', req.content)
+        if (req.thumbnail) {
+            formData.append('thumbnail', req.thumbnail)
+        }
+        formData.append('price', req.price.toString())
+        formData.append('status', req.status.toString())
+        formData.append('categoryId', req.categoryId.toString())
+        formData.append('levelId', req.levelId.toString())
+
+        const config = {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        }
+
+
+        const response = await axiosInstance.put(`/courses/${id}`, formData, config)
         return response.data
     } catch (error) {
         throw new Error(`${error}`)

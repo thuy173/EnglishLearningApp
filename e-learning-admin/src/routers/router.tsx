@@ -49,6 +49,100 @@ const router = createBrowserRouter([
                     Component: (await import('@/pages/category/Category')).default,
                 }),
             },
+            {
+                path: 'levels',
+                lazy: async () => ({
+                    Component: (await import('@/pages/level/Level')).default,
+                }),
+            },
+            {
+                path: 'users',
+                lazy: async () => ({
+                    Component: (await import('@/pages/user/User')).default,
+                }),
+            },
+            {
+                path: 'courses',
+                children: [
+                    {
+                        index: true,
+                        lazy: async () => ({
+                            Component: (await import('@/pages/course/Course')).default,
+                        }),
+                    },
+                    {
+                        path: 'add',
+                        lazy: async () => ({
+                            Component: (await import('@/pages/course/AddCourse')).default,
+                        }),
+                    },
+                    {
+                        path: ':id/update',
+                        lazy: async () => ({
+                            Component: (await import('@/pages/course/UpdateCourse')).default,
+                        }),
+                    },
+                    {
+                        path: ':id/lessons',
+                        lazy: async () => ({
+                            Component: (await import('@/pages/lesson/Lesson')).default,
+                        }),
+                    },
+                    {
+                        path: ':id/lessons/:lessonId',
+                        lazy: async () => ({
+                            Component: (await import('@/pages/lesson/LessonDetail')).default,
+                        }),
+                    },
+                    {
+                        path: ':id/lessons/:lessonId/add-test',
+                        lazy: async () => ({
+                            Component: (await import('@/pages/test/AddTest')).default,
+                        }),
+                    },
+                    {
+                        path: ':id/lessons/:lessonId/update/:testId',
+                        lazy: async () => ({
+                            Component: (await import('@/pages/test/UpdateTest')).default,
+                        }),
+                    }
+                ]
+            },
+            {
+                path: 'vocabularies',
+                children: [
+                    {
+                        index: true,
+                        lazy: async () => ({
+                            Component: (await import('@/pages/vocabulary/Vocabulary')).default,
+                        }),
+                    },
+                    {
+                        path: 'add',
+                        lazy: async () => ({
+                            Component: (await import('@/pages/vocabulary/AddVocab')).default,
+                        }),
+                    },
+                    {
+                        path: 'create-with-ai',
+                        lazy: async () => ({
+                            Component: (await import('@/pages/vocabulary/GenerateVocab')).default,
+                        }),
+                    },
+                    {
+                        path: ':id/update',
+                        lazy: async () => ({
+                            Component: (await import('@/pages/vocabulary/UpdateVocab')).default,
+                        }),
+                    },
+                ]
+            },
+            {
+                path: 'profile',
+                lazy: async () => ({
+                    Component: (await import('@/pages/profile/Profile')).default,
+                }),
+            }
         ],
     },
 

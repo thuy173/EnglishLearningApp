@@ -1,4 +1,4 @@
-import { UserRes } from '@/models/user';
+import { UserRes, UserUpdateReq } from '@/models/user';
 import userService from '@/services/userService';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
@@ -19,18 +19,18 @@ const initialState: UserState = {
 export const fetchUser = createAsyncThunk(
     'users/fetchUser',
     async () => {
-        const response = await userService.getUser()
+        const response = await userService.getUserProfile()
         return response
     }
 )
 
-// export const updateUser = createAsyncThunk(
-//     'users/updateUser',
-//     async (req: UserUpdateReq) => {
-//         await userService.updateUserProfile(req)
-//         return req
-//     }
-// )
+export const updateUser = createAsyncThunk(
+    'users/updateUser',
+    async ({ id, req }: { id: number, req: UserUpdateReq }) => {
+        await userService.updateUser(id, req)
+        return req
+    }
+)
 
 const userSlice = createSlice({
     name: 'users',
@@ -45,35 +45,33 @@ const userSlice = createSlice({
             })
             .addCase(fetchUser.fulfilled, (state, action) => {
                 state.fetching = false;
-                // state.user = action.payload;
+                state.user = action.payload;
             })
             .addCase(fetchUser.rejected, (state, action) => {
                 state.fetching = false;
                 state.error = action.error.message || 'Failed to fetch user';
             })
-        // update user
-        // .addCase(updateUser.pending, (state) => {
-        //     state.loading = true;
-        //     state.error = null;
-        // })
-        // .addCase(updateUser.fulfilled, (state, action) => {
-        //     state.loading = false;
-        //     const req = action.payload;
+            // update user
+            .addCase(updateUser.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(updateUser.fulfilled, (state, action) => {
+                state.loading = false;
+                const req = action.payload;
 
-        //     const updatedUser = {
-        //         ...req,
-        //         issueDate: req.issueDate.toString(),
-        //         dateOfBirth: req.dateOfBirth.toString(),
-        //         avatar: `http://209.145.62.69:2234/Resource/${req.avatar}`
-        //     };
+                const updatedUser = {
+                    ...req,
+                    dob: req.dob.toString(),
+                };
 
-        //     // Update the state
-        //     state.user = { ...state.user, ...updatedUser };
-        // })
-        // .addCase(updateUser.rejected, (state, action) => {
-        //     state.loading = false;
-        //     state.error = action.error.message || 'Failed to fetch user';
-        // })
+                // Update the state
+                state.user = { ...state.user, ...updatedUser };
+            })
+            .addCase(updateUser.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message || 'Failed to fetch user';
+            })
     },
 });
 

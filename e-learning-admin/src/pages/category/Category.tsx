@@ -1,3 +1,4 @@
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { PlusIcon } from 'lucide-react'
@@ -14,6 +15,7 @@ import CategoryTableData from '@/sections/category/table/CategoryTableData'
 import SelectRowShow from '@/components/table/SelectRowShow'
 import { PageResponse } from '@/models/common/pageResponse'
 import { CommonSortField } from '@/enums/sort-field/commonSortField'
+import { SortDirection } from '@/enums/sortDirection'
 
 const Category: React.FC = () => {
     const navigate = useNavigate();
@@ -26,6 +28,7 @@ const Category: React.FC = () => {
     const [selectedPageSize, setSelectedPageSize] = useState<string>('10');
     const [searchKey, setSearchKey] = useState('');
     const [selectedSortField, setSelectedSortField] = useState<CommonSortField>();
+    const [selectedSortDir, setSelectedSortDir] = useState<SortDirection>();
 
     const debouncedSearchKey = useDebounce(searchKey, 500);
 
@@ -46,23 +49,22 @@ const Category: React.FC = () => {
             try {
                 setFetching(true)
                 const response = await categoryService.getAllCategories({
-                    pageNumber: currentPage,
+                    pageNumber: currentPage - 1,
                     pageSize: Number(selectedPageSize),
                     name: debouncedSearchKey,
-                    sortField: selectedSortField
+                    sortField: selectedSortField,
+                    sortDirection: selectedSortDir
                 })
                 setCategoriesData(response)
-                setFetching(false)
             } catch (error) {
-                setFetching(false)
-                handleError(error, 'Lỗi!')
+                handleError(error, 'Error!')
             } finally {
                 setFetching(false)
             }
         }
 
         fetchData()
-    }, [currentPage, selectedPageSize, debouncedSearchKey, selectedSortField]);
+    }, [currentPage, selectedPageSize, debouncedSearchKey, selectedSortField, selectedSortDir]);
 
     const handleSelectPageSize = (value: string) => {
         setSelectedPageSize(value)
@@ -89,18 +91,29 @@ const Category: React.FC = () => {
 
     return (
         <div className="container ">
+            <Breadcrumb className='mb-8'>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink to="/">Dashboard</BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbPage>Categories</BreadcrumbPage>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
             <div className="flex items-center justify-between mb-5">
-                <h1 className='font-extrabold text-2xl'>Loại tưởng nhớ</h1>
+                <h1 className='font-extrabold text-2xl'>Category</h1>
                 <Dialog>
                     <DialogTrigger asChild>
                         <Button>
                             <PlusIcon size={16} className='me-1' />
-                            Thêm loại tưởng nhớ
+                            Add category
                         </Button>
                     </DialogTrigger>
                     <DialogContent className='max-w-xl pb-4'>
                         <DialogHeader>
-                            <DialogTitle>Thêm loại tưởng nhớ mới</DialogTitle>
+                            <DialogTitle>Add new category</DialogTitle>
                             <DialogDescription></DialogDescription>
                             <CategoryForm
                                 categoriesData={categoriesData}
@@ -110,7 +123,7 @@ const Category: React.FC = () => {
                     </DialogContent>
                 </Dialog>
             </div>
-            <div className='relative shadow-full-sm rounded-xl'>
+            <div className='relative shadow-full-sm rounded-xl p-4'>
                 <CategoryTableData
                     fetching={fetching}
                     data={categoriesData}
@@ -118,6 +131,7 @@ const Category: React.FC = () => {
                     searchKey={searchKey}
                     setSearchKey={setSearchKey}
                     setSelectedSortField={setSelectedSortField}
+                    setSelectedSortDir={setSelectedSortDir}
                 />
                 {categoriesData.totalElements > 0 && (
                     <div className="pt-5">
@@ -127,7 +141,7 @@ const Category: React.FC = () => {
                                     selectedItem={selectedPageSize}
                                     onSelect={handleSelectPageSize}
                                 />
-                                <p className="text-sm text-muted-foreground">Hiển thị {categoriesData.content?.length} / {categoriesData.totalElements} kết quả</p>
+                                <p className="text-sm text-muted-foreground">Show {categoriesData.content?.length} / {categoriesData.totalElements} result</p>
                             </div>
                             <PagingContent
                                 data={categoriesData}

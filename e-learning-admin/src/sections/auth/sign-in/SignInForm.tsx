@@ -73,6 +73,7 @@ const SignInForm: React.FC<SignInFormProps> = ({ className, ...props }) => {
                                         <Link
                                             to='/forgot-password'
                                             className='text-sm font-medium text-muted-foreground hover:opacity-75'
+                                            tabIndex={-1}
                                         >
                                             Forgot password?
                                         </Link>

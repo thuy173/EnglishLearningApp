@@ -4,10 +4,13 @@ import { PageResponse } from "@/models/common/pageResponse";
 import { LessonReq, LessonRes } from "@/models/lesson";
 import { CommonParam } from "@/types/commonParam";
 import axiosInstance from "./agent";
+import { LessonStatus } from "@/enums/lessonStatus";
 
 interface LessonParams extends CommonParam {
-    name: string;
-    sortField: CommonSortField;
+    name?: string;
+    sortField?: CommonSortField;
+    courseId?: number;
+    status?: LessonStatus;
 }
 
 export const getAllLessons = async ({
@@ -15,7 +18,9 @@ export const getAllLessons = async ({
     pageNumber,
     pageSize,
     sortField,
-    sortDirection
+    sortDirection,
+    courseId,
+    status
 }: LessonParams): Promise<PageResponse<LessonRes>> => {
     try {
         const params: Record<string, string | number | undefined> = {};
@@ -24,6 +29,8 @@ export const getAllLessons = async ({
         if (pageSize !== undefined) params.pageSize = pageSize
         if (sortField) params.sortField = sortField
         if (sortDirection) params.sortDirection = sortDirection
+        if (courseId !== undefined) params.courseId = courseId
+        if (status !== undefined) params.status = status
 
         const queryStr = new URLSearchParams(params as any).toString();
         const url = `/lessons${queryStr ? `?${queryStr}` : ""}`
@@ -43,15 +50,15 @@ export const getLessonById = async (id: number): Promise<LessonRes> => {
     }
 }
 
-export const addLesson = async (req: LessonReq): Promise<void> => {
+export const addLesson = async (req: LessonReq): Promise<LessonRes> => {
     try {
         const formData = new FormData()
 
         formData.append('name', req.name)
-        formData.append('name', req.description)
-        formData.append('name', req.thumbnail)
-        formData.append('name', req.status.toString())
-        formData.append('name', req.courseId.toString())
+        formData.append('description', req.description)
+        formData.append('thumbnail', req.thumbnail)
+        formData.append('status', req.status.toString())
+        formData.append('courseId', req.courseId.toString())
 
         const config = {
             headers: {
@@ -66,9 +73,25 @@ export const addLesson = async (req: LessonReq): Promise<void> => {
     }
 }
 
-export const updateLesson = async (id: number, req: LessonReq): Promise<void> => {
+export const updateLesson = async (id: number, req: LessonReq): Promise<LessonRes> => {
     try {
-        const response = await axiosInstance.put(`/lessons/${id}`, req)
+        const formData = new FormData()
+
+        formData.append('name', req.name)
+        formData.append('description', req.description)
+        if (req.thumbnail) {
+            formData.append('thumbnail', req.thumbnail)
+        }
+        formData.append('status', req.status.toString())
+        formData.append('courseId', req.courseId.toString())
+
+        const config = {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        }
+
+        const response = await axiosInstance.put(`/lessons/${id}`, formData, config)
         return response.data
     } catch (error) {
         throw new Error(`${error}`)

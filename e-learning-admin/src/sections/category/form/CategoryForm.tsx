@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -10,38 +10,94 @@ import { PageResponse } from '@/models/common/pageResponse'
 import { CategoryReq, CategoryRes } from '@/models/category'
 import categoryService from '@/services/categoryService'
 import { handleError } from '@/utils/handleError'
+import PreviewUpload from '@/components/common/PreviewUpload'
+import DragDropField from '@/components/form/DragDropField'
 
 type CategoryFormProps = {
     categoriesData: PageResponse<CategoryRes>;
     setCategoriesData: (data: PageResponse<CategoryRes>) => void;
-}
-const CategoryForm: React.FC<CategoryFormProps> = ({ categoriesData, setCategoriesData }) => {
+} & (
+        | {
+            updateItem: CategoryRes;
+            onClose: (id: number) => void;
+        }
+        | {
+            updateItem?: undefined;
+            onClose?: undefined;
+        }
+    );
+
+const CategoryForm: React.FC<CategoryFormProps> = ({ categoriesData, setCategoriesData, updateItem, onClose }) => {
     const [loading, setLoading] = useState<boolean>(false);
+    const [previewImage, setPreviewImage] = useState<string>('');
 
     const form = useForm<CategoryReq>({
         defaultValues: {
             name: '',
             description: '',
+            icon: '',
+            status: false,
         },
-    });
+    })
 
-    const handleSave = async () => {
+    useEffect(() => {
+        if (updateItem && updateItem.id) {
+            form.reset({
+                name: updateItem.name,
+                description: updateItem.description,
+                status: updateItem.status
+            })
+        }
+    }, [updateItem, form])
+
+    const handleSave = async (formData: CategoryReq) => {
         try {
             setLoading(true)
-            const response = await categoryService.addCategory(form.getValues())
-            setLoading(false)
-            setCategoriesData({
-                ...categoriesData,
-                content: [...categoriesData.content, response],
-                totalElements: categoriesData.totalElements + 1
-            })
-            form.reset()
-            toast.success('Thêm loại tưởng nhớ thành công!')
+            if (!(formData.icon instanceof File)) {
+                form.reset({
+                    ...formData,
+                    icon: ''
+                })
+            }
+
+            if (updateItem && updateItem.id) {
+                const response = await categoryService.updateCategory(updateItem.id, form.getValues())
+                const updatedItem = response;
+                const index = categoriesData.content.findIndex((item) => item.id === updateItem.id);
+
+                if (index >= 0) {
+                    const updatedItems = [...categoriesData.content];
+                    updatedItems[index] = { ...updatedItems[index], ...updatedItem };
+
+                    setCategoriesData({
+                        ...categoriesData,
+                        content: updatedItems,
+                    });
+                }
+                toast.success('Update category successfully!')
+                onClose(updateItem.id)
+            } else {
+                const response = await categoryService.addCategory(form.getValues())
+                setCategoriesData({
+                    ...categoriesData,
+                    content: [...categoriesData.content, response],
+                    totalElements: categoriesData.totalElements + 1
+                })
+                form.reset()
+                setPreviewImage('')
+                toast.success('Add new category successfully!')
+            }
         } catch (error) {
-            setLoading(false)
-            handleError(error, 'Thêm loại tưởng nhớ lỗi!')
+            handleError(error, 'Error!')
         } finally {
             setLoading(false)
+        }
+    }
+
+    const handleImageChange = (file: File) => {
+        if (file) {
+            const newPreviewImage = URL.createObjectURL(file);
+            setPreviewImage(newPreviewImage);
         }
     }
 
@@ -50,18 +106,43 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ categoriesData, setCategori
             <FormProvider {...form}>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(handleSave)}>
+                        <div className='w-96'>
+                            {(previewImage || updateItem?.icon) ? (
+                                <PreviewUpload
+                                    onDelete={() => {
+                                        const newPreviewImage = '';
+                                        setPreviewImage(newPreviewImage);
+                                        form.setValue(`icon`, '');
+                                    }}
+                                    currentLink={updateItem?.icon}
+                                    file={form.getValues('icon')}
+                                />
+                            ) : (
+                                <div className="mb-3">
+                                    <DragDropField
+                                        form={form}
+                                        name={`icon`}
+                                        isRequired={true}
+                                        label={'Hình ảnh'}
+                                        description={'PNG, JPG, WEBP,...'}
+                                        accept='image/*'
+                                        handleFileChange={(file) => handleImageChange(file)}
+                                    />
+                                </div>
+                            )}
+                        </div>
                         <div className="mb-3">
                             <FormField
                                 control={form.control}
                                 name="name"
                                 rules={{
-                                    required: 'Tên loại tưởng nhớ là bắt buộc'
+                                    required: 'Name is required'
                                 }}
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Tên loại tưởng nhớ</FormLabel>
+                                        <FormLabel>Name</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="Tên loại tưởng nhớ" {...field} />
+                                            <Input placeholder="Name" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -73,17 +154,16 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ categoriesData, setCategori
                                 control={form.control}
                                 name="description"
                                 rules={{
-                                    required: 'Mô tả là bắt buộc',
                                     maxLength: {
                                         value: 255,
-                                        message: 'Mô tả không được dài quá 255 ký tự'
+                                        message: 'Description cannot be longer than 255 character'
                                     }
                                 }}
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Mô tả</FormLabel>
+                                        <FormLabel>Description</FormLabel>
                                         <FormControl>
-                                            <Textarea placeholder="Mô tả" className='resize-none' {...field} />
+                                            <Textarea placeholder="Description" className='resize-none' {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -97,7 +177,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ categoriesData, setCategori
                                 </Button>
                             </DialogClose>
                             <Button type='submit' tabIndex={0} className="px-6" loading={loading}>
-                                Add
+                                {updateItem ? 'Update' : 'Add'}
                             </Button>
                         </div>
                     </form>

@@ -6,8 +6,8 @@ import { CommonParam } from "@/types/commonParam";
 import axiosInstance from "./agent";
 
 interface LevelParams extends CommonParam {
-    name: string;
-    sortField: CommonSortField;
+    name?: string;
+    sortField?: CommonSortField;
 }
 
 export const getAllLevels = async ({
@@ -43,7 +43,7 @@ export const getLevelById = async (id: number): Promise<LevelRes> => {
     }
 }
 
-export const addLevel = async (req: LevelReq): Promise<void> => {
+export const addLevel = async (req: LevelReq): Promise<LevelRes> => {
     try {
         const response = await axiosInstance.post(`/levels`, req)
         return response.data

@@ -9,9 +9,7 @@ import MenuItem from '../sidebar/MenuItem'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Link } from 'react-router-dom'
-import { Input } from '@/components/ui/input'
 import { useTheme } from '@/context/ThemeContext'
-import Notifications from './Notifications'
 
 const TopNav: React.FC = () => {
     const { theme, setTheme } = useTheme()
@@ -56,7 +54,6 @@ const TopNav: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-3 justify-end">
-                <Input type='text' placeholder='Tìm kiếm...' className='md:w-[100px] lg:w-[300px]' />
                 <div className='flex items-center gap-1'>
                     <Button
                         size={'icon'}
@@ -66,7 +63,6 @@ const TopNav: React.FC = () => {
                     >
                         {theme === 'light' ? <MoonIcon size={20} /> : <SunIcon size={20} />}
                     </Button>
-                    <Notifications />
                 </div>
                 <DropdownMenu>
                     <DropdownMenuTrigger>

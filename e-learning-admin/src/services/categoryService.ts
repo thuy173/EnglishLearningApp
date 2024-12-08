@@ -45,16 +45,42 @@ export const getCategoryById = async (id: number): Promise<CategoryRes> => {
 
 export const addCategory = async (req: CategoryReq): Promise<CategoryRes> => {
     try {
-        const response = await axiosInstance.post(`/categories`, req)
+        const formData = new FormData()
+        formData.append('name', req.name)
+        formData.append('icon', req.icon)
+        formData.append('description', req.description)
+        formData.append('status', req.status.toString())
+
+        const config = {
+            headers: {
+                'Content-Type': 'Multipart/form-data'
+            }
+        }
+
+        const response = await axiosInstance.post(`/categories`, formData, config)
         return response.data
     } catch (error) {
         throw new Error(`${error}`)
     }
 }
 
-export const updateCategory = async (id: number, req: CategoryReq): Promise<void> => {
+export const updateCategory = async (id: number, req: CategoryReq): Promise<CategoryRes> => {
     try {
-        const response = await axiosInstance.put(`/categories/${id}`, req)
+        const formData = new FormData()
+        formData.append('name', req.name)
+        if (req.icon) {
+            formData.append('icon', req.icon)
+        }
+        formData.append('description', req.description)
+        formData.append('status', req.status.toString())
+
+        const config = {
+            headers: {
+                'Content-Type': 'Multipart/form-data'
+            }
+        }
+
+        const response = await axiosInstance.put(`/categories/${id}`, formData, config)
         return response.data
     } catch (error) {
         throw new Error(`${error}`)

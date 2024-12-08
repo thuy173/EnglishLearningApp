@@ -30,6 +30,7 @@ export default {
       },
       boxShadow: {
         'full': '0px 0px 15px rgba(0,0,0,0.09)',
+        'full-sm': '0px 0px 5px rgba(0,0,0,0.09)',
       },
       fontFamily: {
         plusJakartaSans: "Plus Jakarta Sans",

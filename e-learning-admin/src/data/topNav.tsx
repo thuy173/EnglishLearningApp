@@ -1,4 +1,4 @@
-import { BlocksIcon, HomeIcon, ShapesIcon, UsersIcon, WholeWordIcon } from "lucide-react";
+import { BlocksIcon, ChartNoAxesColumn, HomeIcon, ShapesIcon, UsersIcon, WholeWordIcon } from "lucide-react";
 
 export interface MenuObj {
     title: string;
@@ -23,6 +23,11 @@ export const topNavs: MenuObj[] = [
         title: 'Categories',
         icon: <BlocksIcon size={18} />,
         href: '/categories'
+    },
+    {
+        title: 'Levels',
+        icon: <ChartNoAxesColumn size={18} />,
+        href: '/levels'
     },
     {
         title: 'Courses',

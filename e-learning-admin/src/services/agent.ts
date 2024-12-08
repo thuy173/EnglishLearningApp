@@ -58,12 +58,15 @@ class CustomError extends Error {
 axiosInstance.interceptors.response.use(
     (response) => response,
     async (error) => {
+        const originalRequest = error.config;
+
         if (!axios.isAxiosError(error)) {
             console.error(`Unexpected error: ${error.message}`);
             return Promise.reject(error);
         }
 
-        if (error.response?.status === 401 || error.response?.status === 403) {
+        if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry) {
+            originalRequest._retry = true;
 
             deleteTokenCookie();
             window.location.replace('/login');

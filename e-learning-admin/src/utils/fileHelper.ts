@@ -1,7 +1,7 @@
 type FileType = 'image' | 'doc' | 'pdf';
 
 export function getFileExtension(filename: string): string | undefined {
-    return filename.split('.').pop();
+    return filename?.split('.').pop();
 }
 
 export const checkFileType = (link: string): FileType | 'unknown' => {
