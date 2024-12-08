@@ -40,19 +40,21 @@ public class LevelServiceImpl implements LevelService {
     }
 
     @Override
-    public void createData(LevelRequest levelRequest) {
+    public LevelResponse createData(LevelRequest levelRequest) {
         Level level = new Level();
         levelMapper.convertToEntity(level, levelRequest);
         levelRepository.save(level);
+        return levelMapper.convertToResponse(level);
     }
 
     @Override
-    public void updateData(Integer id, LevelRequest levelRequest) {
+    public LevelResponse updateData(Integer id, LevelRequest levelRequest) {
         Level existingLevel = levelRepository.findById(id)
                 .orElseThrow(() -> new EmptyException("Level not found with id " + id));
 
         levelMapper.convertToEntity(existingLevel, levelRequest);
         levelRepository.save(existingLevel);
+        return levelMapper.convertToResponse(existingLevel);
     }
 
     @Override

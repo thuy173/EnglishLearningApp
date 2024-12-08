@@ -8,6 +8,7 @@ import java.util.List;
 @Data
 public class QuestionResponse {
     private String id;
+    private String prompt;
     private String content;
     private QuestionType type;
     private Integer points;

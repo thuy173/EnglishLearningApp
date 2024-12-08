@@ -1,6 +1,7 @@
 package com.example.elearningapi.controller.admin;
 
-import com.example.elearningapi.beans.request.VocabularyRequest;
+import com.example.elearningapi.beans.request.vocab.ManyVocabRequest;
+import com.example.elearningapi.beans.request.vocab.VocabularyRequest;
 import com.example.elearningapi.beans.response.vocabulary.VocabularyResponse;
 import com.example.elearningapi.enums.VocabStatus;
 import com.example.elearningapi.service.VocabularyService;
@@ -49,10 +50,16 @@ public class AdminVocabularyController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @PostMapping(value = "/many")
+    public ResponseEntity<Void> addManyVocab(@Valid @RequestBody List<ManyVocabRequest> vocabularyRequests) {
+        vocabularyService.createManyData(vocabularyRequests);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateVocab(@PathVariable Long id, @Valid @ModelAttribute VocabularyRequest vocabularyRequest) {
-        vocabularyService.updateData(id, vocabularyRequest);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<VocabularyResponse> updateVocab(@PathVariable Long id, @Valid @ModelAttribute VocabularyRequest vocabularyRequest) {
+        VocabularyResponse updatedVocab = vocabularyService.updateData(id, vocabularyRequest);
+        return ResponseEntity.ok().body(updatedVocab);
     }
 
     @DeleteMapping("/{id}")

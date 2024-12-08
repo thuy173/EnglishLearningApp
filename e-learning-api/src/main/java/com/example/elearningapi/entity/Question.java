@@ -20,6 +20,9 @@ public class Question {
     private String id;
 
     @NotBlank
+    private String prompt;
+
+    @NotBlank
     private String content;
 
     @NotNull

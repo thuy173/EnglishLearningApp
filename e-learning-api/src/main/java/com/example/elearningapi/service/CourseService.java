@@ -18,6 +18,12 @@ public interface CourseService {
 
     CourseResponse getById(Long id);
 
+    List<ShortCourseResponse> getLatestCourses();
+
+    List<ShortCourseResponse> getMostEnrolledCourses();
+
+    List<ShortCourseResponse> getRandomCourses();
+
     void createData(CourseRequest courseRequest);
 
     void updateData(Long id, CourseRequest courseRequest);
@@ -25,4 +31,5 @@ public interface CourseService {
     void deleteOne(Long id);
 
     void deleteMultiple(List<Long> ids);
+
 }

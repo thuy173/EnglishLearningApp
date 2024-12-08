@@ -17,9 +17,9 @@ public interface LessonService {
 
     LessonResponse getById(Long id);
 
-    void createData(LessonRequest lessonRequest);
+    LessonResponse createData(LessonRequest lessonRequest);
 
-    void updateData(Long id, LessonRequest lessonRequest);
+    LessonResponse updateData(Long id, LessonRequest lessonRequest);
 
     void deleteOne(Long id);
 

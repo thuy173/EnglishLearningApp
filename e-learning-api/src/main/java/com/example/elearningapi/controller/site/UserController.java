@@ -24,9 +24,9 @@ public class UserController {
         return userDetailsService.getCurrentUserInformation();
     }
 
-    @PutMapping(value = "/{id}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateUser(@PathVariable Long id, @Valid @ModelAttribute UpdateProfileRequest request) {
-        userDetailsService.updateData(id, request);
-        return ResponseEntity.ok().build();
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserResponse> updateUser( @Valid @ModelAttribute UpdateProfileRequest request) {
+        UserResponse userUpdate = userDetailsService.updateData( request);
+        return ResponseEntity.ok(userUpdate);
     }
 }

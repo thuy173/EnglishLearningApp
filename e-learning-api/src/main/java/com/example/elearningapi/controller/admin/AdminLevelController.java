@@ -41,15 +41,15 @@ public class AdminLevelController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> addLevel(@Valid @RequestBody LevelRequest levelRequest) {
-        levelService.createData(levelRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<LevelResponse> addLevel(@Valid @RequestBody LevelRequest levelRequest) {
+        LevelResponse newLevel = levelService.createData(levelRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newLevel);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateLevel(@PathVariable Integer id, @Valid @RequestBody LevelRequest levelRequest) {
-        levelService.updateData(id, levelRequest);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<LevelResponse> updateLevel(@PathVariable Integer id, @Valid @RequestBody LevelRequest levelRequest) {
+        LevelResponse updatedLevel = levelService.updateData(id, levelRequest);
+        return ResponseEntity.ok().body(updatedLevel);
     }
 
     @DeleteMapping("/{id}")

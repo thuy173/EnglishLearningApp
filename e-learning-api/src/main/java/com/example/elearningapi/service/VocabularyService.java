@@ -1,9 +1,7 @@
 package com.example.elearningapi.service;
 
-import com.example.elearningapi.beans.request.CourseRequest;
-import com.example.elearningapi.beans.request.VocabularyRequest;
-import com.example.elearningapi.beans.response.course.CourseResponse;
-import com.example.elearningapi.beans.response.course.ShortCourseResponse;
+import com.example.elearningapi.beans.request.vocab.ManyVocabRequest;
+import com.example.elearningapi.beans.request.vocab.VocabularyRequest;
 import com.example.elearningapi.beans.response.vocabulary.VocabularyResponse;
 import com.example.elearningapi.enums.VocabStatus;
 import org.springframework.data.domain.Page;
@@ -19,8 +17,9 @@ public interface VocabularyService {
     VocabularyResponse getById(Long id);
 
     void createData(VocabularyRequest vocabularyRequest);
+    void createManyData(List<ManyVocabRequest> vocabularyRequests);
 
-    void updateData(Long id, VocabularyRequest vocabularyRequest);
+    VocabularyResponse updateData(Long id, VocabularyRequest vocabularyRequest);
 
     void deleteOne(Long id);
 

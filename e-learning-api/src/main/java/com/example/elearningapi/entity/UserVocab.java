@@ -2,12 +2,18 @@ package com.example.elearningapi.entity;
 
 import com.example.elearningapi.enums.UserVocabStatus;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "user_vocabs")
 public class UserVocab {
@@ -24,7 +30,7 @@ public class UserVocab {
     private Vocabulary vocab;
 
     @Enumerated(EnumType.STRING)
-    private UserVocabStatus status = UserVocabStatus.NEW;
+    private UserVocabStatus status;
 
     @Column(name = "mastery_level")
     private Integer masteryLevel = 0;
@@ -43,8 +49,5 @@ public class UserVocab {
 
     @Column(name = "incorrect_count")
     private Integer incorrectCount = 0;
-
-    @OneToMany(mappedBy = "userVocab", cascade = CascadeType.ALL)
-    private List<VocabReviewHistory> reviewHistory;
 
 }

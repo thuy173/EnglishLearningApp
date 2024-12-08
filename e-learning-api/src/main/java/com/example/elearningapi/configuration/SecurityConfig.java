@@ -34,12 +34,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         req -> req.requestMatchers(
-                                        "/api/auth/login/**",
-                                        "/api/auth/sign-up/**",
-                                        "/api/auth/logout",
-                                        "/api/admin/auth/login/**",
-                                        "/api/admin/auth/sign-up/**",
-                                        "/api/ipa/**"
+                                        "/api/auth/**",
+                                        "/api/admin/auth/**",
+                                        "/api/admin/upload"
                                 ).permitAll()
                                 .requestMatchers(
                                         "/api/categories/**",
@@ -48,9 +45,14 @@ public class SecurityConfig {
                                         "/api/lessons/**",
                                         "/api/vocabularies/**",
                                         "/api/lesson-vocab/**",
+                                        "/api/search",
+                                        "/api/ipa/**"
+                                ).permitAll()
+                                .requestMatchers(
                                         "/api/progress/**",
                                         "/api/information/**",
-                                        "/api/user-vocab/**"
+                                        "/api/user-vocab/**",
+                                        "/api/testing/**"
                                 ).hasAnyRole("USER","ADMIN")
                                 .requestMatchers(
                                         "/api/admin/categories/**",
@@ -58,7 +60,11 @@ public class SecurityConfig {
                                         "/api/admin/courses/**",
                                         "/api/admin/lessons/**",
                                         "/api/admin/vocabularies/**",
-                                        "/api/admin/lesson-vocab/**"
+                                        "/api/admin/lesson-vocab/**",
+                                        "/api/admin/questions/**",
+                                        "/api/admin/testing/**",
+                                        "/api/admin/users/**",
+                                        "/api/admin/dashboard/**"
                                 ).hasRole("ADMIN")
                                 .requestMatchers(AUTH_WHITELIST).permitAll()
                 ).userDetailsService(userDetailsService)

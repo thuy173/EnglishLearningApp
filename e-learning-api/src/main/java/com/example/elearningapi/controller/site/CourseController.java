@@ -11,6 +11,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/courses")
 @RequiredArgsConstructor
@@ -37,5 +39,20 @@ public class CourseController {
     @GetMapping("/{id}")
     public CourseResponse getCourseById(@PathVariable Long id) {
         return courseService.getById(id);
+    }
+
+    @GetMapping("/latest")
+    public ResponseEntity<List<ShortCourseResponse>> getLatestCourses(){
+        return ResponseEntity.ok(courseService.getLatestCourses());
+    }
+
+    @GetMapping("/most-enrolled")
+    public ResponseEntity<List<ShortCourseResponse>> getMostEnrolledCourses(){
+        return ResponseEntity.ok(courseService.getMostEnrolledCourses());
+    }
+
+    @GetMapping("/random")
+    public ResponseEntity<List<ShortCourseResponse>> getRandomCourses(){
+        return ResponseEntity.ok(courseService.getRandomCourses());
     }
 }

@@ -1,26 +1,19 @@
 package com.example.elearningapi.service;
 
-import com.example.elearningapi.beans.request.CourseEnrollRequest;
-import com.example.elearningapi.beans.request.UpdateLearningTimeRequest;
+import com.example.elearningapi.beans.request.progress.UserLearningProgressRequest;
 import com.example.elearningapi.beans.response.UserCourseResponse;
-import com.example.elearningapi.beans.response.user.UserProgressResponse;
-import com.example.elearningapi.entity.UserCourse;
-import com.example.elearningapi.enums.UserCourseStatus;
+import com.example.elearningapi.beans.response.progress.UserLearningProgressResponse;
+import com.example.elearningapi.entity.Lesson;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Map;
 
 @Service
 public interface CourseProgressService {
 
-    UserProgressResponse getUserProgress(Long userId, Long courseId);
+    UserCourseResponse enrollCourse(Long courseId);
 
-    UserCourseResponse enrollCourse(CourseEnrollRequest request);
+    UserLearningProgressResponse submitLessonProgress(UserLearningProgressRequest request);
 
-    void updateLearningTime(UpdateLearningTimeRequest request);
+    UserLearningProgressResponse getCourseProgress(Long courseId);
 
-    Map<String, Object> getUserStatistics(Long userId);
-
-    List<UserCourseResponse> getUserCourses(Long userId, UserCourseStatus status);
+    void handleNewLessonInCourse(Long courseId, Lesson newLesson);
 }

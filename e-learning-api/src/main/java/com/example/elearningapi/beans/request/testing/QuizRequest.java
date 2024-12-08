@@ -11,6 +11,7 @@ public class QuizRequest {
     private String title;
 
     private String description;
+    private Long levelId;
     private Long lessonId;
     private Integer timeLimit;
     private Integer passingScore;

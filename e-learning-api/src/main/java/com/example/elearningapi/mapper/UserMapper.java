@@ -1,14 +1,11 @@
 package com.example.elearningapi.mapper;
 
-import com.example.elearningapi.beans.request.CourseRequest;
+import com.example.elearningapi.beans.request.UserRequest;
+import com.example.elearningapi.beans.request.UserUpdateRequest;
 import com.example.elearningapi.beans.request.auth.UpdateProfileRequest;
-import com.example.elearningapi.beans.response.course.CourseResponse;
 import com.example.elearningapi.beans.response.user.UserResponse;
-import com.example.elearningapi.entity.Category;
-import com.example.elearningapi.entity.Course;
-import com.example.elearningapi.entity.Level;
-import com.example.elearningapi.entity.User;
-import com.example.elearningapi.exception.ResourceNotFoundException;
+import com.example.elearningapi.entity.*;
+import com.example.elearningapi.repository.RoleRepository;
 import com.example.elearningapi.service.UploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -19,6 +16,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class UserMapper {
     private final UploadService uploadService;
+    private final RoleRepository roleRepository;
 
     public UserResponse convertToResponse(User user) {
         UserResponse userResponse = new UserResponse();
@@ -29,6 +27,7 @@ public class UserMapper {
         userResponse.setDob(user.getDob());
         userResponse.setGender(user.getGender());
         userResponse.setAvatar(user.getAvatar());
+        userResponse.setStatus(user.getStatus());
         userResponse.setCreatedAt(user.getCreatedAt());
         userResponse.setUpdatedAt(user.getUpdatedAt());
 
@@ -38,6 +37,7 @@ public class UserMapper {
     public void convertToEntity(User user, UpdateProfileRequest request) {
         user.setFullName(request.getFullName());
         user.setPhoneNumber(request.getPhoneNumber());
+        user.setGender(request.getGender());
         user.setDob(request.getDob());
 
         if (request.getAvatar() != null && !request.getAvatar().isEmpty()) {
@@ -46,6 +46,34 @@ public class UserMapper {
         } else {
             user.setAvatar(user.getAvatar());
         }
+    }
 
+    public void convertToRequest(User user, UserRequest request) {
+        user.setFullName(request.getFullName());
+        user.setEmail(request.getEmail());
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setGender(request.getGender());
+        user.setDob(request.getDob());
+        user.setStatus(false);
+        user.setCreatedAt(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now());
+
+        Role userRole = roleRepository.findByName("ROLE_TEACHER");
+
+        if(userRole == null){
+            userRole = new Role();
+            userRole.setName("ROLE_TEACHER");
+            userRole = roleRepository.save(userRole);
+        }
+        user.setRole(userRole);
+    }
+
+    public void convertToUpdateRequest(User user, UserUpdateRequest request) {
+        user.setFullName(request.getFullName());
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setGender(request.getGender());
+        user.setDob(request.getDob());
+        user.setStatus(request.getStatus());
+        user.setUpdatedAt(LocalDateTime.now());
     }
 }

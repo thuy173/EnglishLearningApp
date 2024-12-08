@@ -1,20 +1,18 @@
-package com.example.elearningapi.beans.request;
+package com.example.elearningapi.beans.request.vocab;
 
 import com.example.elearningapi.enums.VocabStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import org.springframework.web.multipart.MultipartFile;
 
 @Data
-public class VocabularyRequest {
-
+public class ManyVocabRequest {
     @NotBlank(message = "Word is required")
     private String word;
 
     private String ipa;
 
-    private MultipartFile image;
+    private String image;
 
     private String meaning;
 

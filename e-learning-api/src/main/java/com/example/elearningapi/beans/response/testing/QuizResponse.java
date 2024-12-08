@@ -10,6 +10,7 @@ public class QuizResponse {
     private String id;
     private String title;
     private String description;
+    private Integer levelId;
     private Long lessonId;
     private Integer timeLimit;
     private Integer passingScore;

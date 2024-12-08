@@ -21,7 +21,6 @@ public class LessonController {
     @GetMapping
     public ResponseEntity<Page<ShortLessonResponse>> getAllLessons(
             @RequestParam(required = false) String name,
-            @RequestParam(required = false) LessonStatus status,
             @RequestParam(required = true) Long courseId,
             @RequestParam(defaultValue = "0") int pageNumber,
             @RequestParam(defaultValue = "10") int pageSize,
@@ -29,7 +28,7 @@ public class LessonController {
             @RequestParam(defaultValue = "ASC") Sort.Direction sortDirection) {
 
         Page<ShortLessonResponse> lessons = lessonService.getAllData(
-                name, courseId, status, pageNumber, pageSize, sortField, sortDirection);
+                name, courseId, LessonStatus.READY, pageNumber, pageSize, sortField, sortDirection);
 
         return ResponseEntity.ok(lessons);
     }

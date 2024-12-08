@@ -16,9 +16,9 @@ public interface CategoryService {
 
     CategoryResponse getById(Integer id);
 
-    void createData(CategoryRequest categoryRequest);
+    CategoryResponse createData(CategoryRequest categoryRequest);
 
-    void updateData(Integer id, CategoryRequest categoryRequest);
+    CategoryResponse updateData(Integer id, CategoryRequest categoryRequest);
 
     void deleteOne(Integer id);
 

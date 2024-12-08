@@ -28,7 +28,7 @@ public class AdminCourseController {
     public ResponseEntity<Page<ShortCourseResponse>> getAllCourses(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) CourseStatus status,
-            @RequestParam(required = true) Integer categoryId,
+            @RequestParam(required = false) Integer categoryId,
             @RequestParam(required = false) Integer levelId,
             @RequestParam(defaultValue = "0") int pageNumber,
             @RequestParam(defaultValue = "10") int pageSize,

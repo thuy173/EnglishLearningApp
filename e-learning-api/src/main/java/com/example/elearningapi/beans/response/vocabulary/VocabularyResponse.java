@@ -17,6 +17,7 @@ public class VocabularyResponse {
     private String example;
     private String collocation;
     private VocabStatus status;
+    private Integer levelId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

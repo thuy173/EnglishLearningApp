@@ -46,15 +46,15 @@ public class AdminLessonController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> addLesson(@Valid @ModelAttribute LessonRequest lessonRequest) {
-        lessonService.createData(lessonRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<LessonResponse> addLesson(@Valid @ModelAttribute LessonRequest lessonRequest) {
+        LessonResponse newLesson = lessonService.createData(lessonRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newLesson);
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateLesson(@PathVariable Long id, @Valid @ModelAttribute LessonRequest lessonRequest) {
-        lessonService.updateData(id, lessonRequest);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<LessonResponse> updateLesson(@PathVariable Long id, @Valid @ModelAttribute LessonRequest lessonRequest) {
+        LessonResponse updatedLesson = lessonService.updateData(id, lessonRequest);
+        return ResponseEntity.ok().body(updatedLesson);
     }
 
     @DeleteMapping("/{id}")

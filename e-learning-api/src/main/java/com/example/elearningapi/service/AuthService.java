@@ -1,8 +1,6 @@
 package com.example.elearningapi.service;
 
-import com.example.elearningapi.beans.request.auth.LoginRequest;
-import com.example.elearningapi.beans.request.auth.SignUpRequest;
-import com.example.elearningapi.beans.request.auth.SignUpUserRequest;
+import com.example.elearningapi.beans.request.auth.*;
 import com.example.elearningapi.beans.response.AuthResponse;
 import org.springframework.stereotype.Service;
 
@@ -18,4 +16,8 @@ public interface AuthService {
     AuthResponse loginAdmin(LoginRequest loginRequest);
 
     void logout();
+
+    String forgotPassword(ForgotPasswordRequest forgotPasswordRequest, String source);
+
+    void resetPassword(ResetPasswordRequest resetPasswordRequest);
 }

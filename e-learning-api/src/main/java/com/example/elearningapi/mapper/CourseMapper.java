@@ -9,7 +9,9 @@ import com.example.elearningapi.entity.Level;
 import com.example.elearningapi.exception.ResourceNotFoundException;
 import com.example.elearningapi.repository.CategoryRepository;
 import com.example.elearningapi.repository.LevelRepository;
+import com.example.elearningapi.repository.UserLessonRepository;
 import com.example.elearningapi.service.UploadService;
+import com.example.elearningapi.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +23,8 @@ public class CourseMapper {
     private final CategoryRepository categoryRepository;
     private final LevelRepository levelRepository;
     private final UploadService uploadService;
+    private final UserLessonRepository userLessonRepository;
+    private final SecurityUtils securityUtils;
 
     public void convertToEntity(Course course, CourseRequest courseRequest) {
         course.setName(courseRequest.getName());
@@ -63,17 +67,25 @@ public class CourseMapper {
         courseResponse.setThumbnail(course.getThumbnail());
         courseResponse.setPrice(course.getPrice());
         courseResponse.setStatus(course.getStatus());
+        courseResponse.setCategoryId(course.getCategory().getId());
+        courseResponse.setLevelId(course.getLevel().getId());
         courseResponse.setCreatedAt(course.getCreatedAt());
         courseResponse.setUpdatedAt(course.getUpdatedAt());
         return courseResponse;
     }
 
     public ShortCourseResponse convertToShortResponse(Course course) {
+        Long userId = securityUtils.getCurrentUserId();
         ShortCourseResponse courseResponse = new ShortCourseResponse();
         courseResponse.setId(course.getId());
         courseResponse.setName(course.getName());
         courseResponse.setThumbnail(course.getThumbnail());
+        courseResponse.setDescription(course.getDescription());
         courseResponse.setStatus(course.getStatus());
+        courseResponse.setCategoryName(course.getCategory().getName());
+        courseResponse.setLevelName(course.getLevel().getName());
+        courseResponse.setTotalLessons(course.getLessons() != null ? course.getLessons().size() : 0);
+        courseResponse.setCompletedLessons(userLessonRepository.countCompletedLessonInCourse(userId,course.getId()));
         return courseResponse;
     }
 }

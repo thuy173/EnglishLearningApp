@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -38,7 +39,7 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private GenderStatus gender;
 
-    private LocalDateTime dob;
+    private LocalDate dob;
 
     private Boolean status;
 

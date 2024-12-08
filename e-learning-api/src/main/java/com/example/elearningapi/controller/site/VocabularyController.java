@@ -20,14 +20,13 @@ public class VocabularyController {
     @GetMapping
     public ResponseEntity<Page<VocabularyResponse>> getAllVocabularies(
             @RequestParam(required = false) String word,
-            @RequestParam(required = false) VocabStatus status,
             @RequestParam(defaultValue = "0") int pageNumber,
             @RequestParam(defaultValue = "10") int pageSize,
             @RequestParam(defaultValue = "id") String sortField,
             @RequestParam(defaultValue = "ASC") Sort.Direction sortDirection) {
 
         Page<VocabularyResponse> vocabularies = vocabularyService.getAllData(
-                word, status, pageNumber, pageSize, sortField, sortDirection);
+                word, VocabStatus.ACTIVE, pageNumber, pageSize, sortField, sortDirection);
 
         return ResponseEntity.ok(vocabularies);
     }

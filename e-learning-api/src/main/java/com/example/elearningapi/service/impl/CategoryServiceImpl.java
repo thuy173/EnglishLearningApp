@@ -50,19 +50,21 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void createData(CategoryRequest categoryRequest) {
+    public CategoryResponse createData(CategoryRequest categoryRequest) {
         Category category = new Category();
         categoryMapper.convertToEntity(category, categoryRequest);
         categoryRepository.save(category);
+        return categoryMapper.convertToResponse(category);
     }
 
     @Override
-    public void updateData(Integer id, CategoryRequest categoryRequest) {
+    public CategoryResponse updateData(Integer id, CategoryRequest categoryRequest) {
         Category existingCategory = categoryRepository.findById(id)
                 .orElseThrow(() -> new EmptyException("Category not found with id " + id));
 
         categoryMapper.convertToEntity(existingCategory, categoryRequest);
         categoryRepository.save(existingCategory);
+        return categoryMapper.convertToResponse(existingCategory);
     }
 
     @Override

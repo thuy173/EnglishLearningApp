@@ -18,6 +18,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -58,6 +59,31 @@ public class CourseServiceImpl implements CourseService {
                 .orElseThrow(() -> new EmptyException("Course not found " + id));
 
         return courseMapper.convertToResponse(course);
+    }
+
+    @Override
+    public List<ShortCourseResponse> getLatestCourses() {
+        Pageable pageable = PageRequest.of(0, 12,
+                Sort.by(Sort.Direction.DESC, "createdAt"));
+        return courseRepository.findAll(pageable)
+                .map(courseMapper::convertToShortResponse)
+                .getContent();
+    }
+
+    @Override
+    public List<ShortCourseResponse> getMostEnrolledCourses() {
+        return courseRepository.findMostEnrolledCourses(PageRequest.of(0,10))
+                .stream()
+                .map(courseMapper::convertToShortResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ShortCourseResponse> getRandomCourses() {
+        return courseRepository.findRandomCourses(10)
+                .stream()
+                .map(courseMapper::convertToShortResponse)
+                .collect(Collectors.toList());
     }
 
     @Override

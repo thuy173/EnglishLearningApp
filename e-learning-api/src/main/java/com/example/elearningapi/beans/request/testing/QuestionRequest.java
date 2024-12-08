@@ -11,6 +11,8 @@ import java.util.List;
 
 @Data
 public class QuestionRequest {
+    @NotBlank
+    private String prompt;
 
     @NotBlank
     private String content;

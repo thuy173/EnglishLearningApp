@@ -43,15 +43,15 @@ public class AdminCategoryController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> addCategory(@Valid @ModelAttribute CategoryRequest categoryRequest) {
-        categoryService.createData(categoryRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<CategoryResponse> addCategory(@Valid @ModelAttribute CategoryRequest categoryRequest) {
+        CategoryResponse newCategory = categoryService.createData(categoryRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newCategory);
     }
 
     @PutMapping(value = "/{id}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateCategory(@PathVariable Integer id, @Valid @ModelAttribute CategoryRequest categoryRequest) {
-        categoryService.updateData(id, categoryRequest);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Integer id, @Valid @ModelAttribute CategoryRequest categoryRequest) {
+        CategoryResponse updatedCategory = categoryService.updateData(id, categoryRequest);
+        return ResponseEntity.ok().body(updatedCategory);
     }
 
     @DeleteMapping("/{id}")

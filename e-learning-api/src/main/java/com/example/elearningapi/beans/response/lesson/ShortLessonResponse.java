@@ -10,5 +10,8 @@ public class ShortLessonResponse {
     private Long id;
     private String name;
     private String thumbnail;
+    private String description;
     private LessonStatus status;
+    private Integer vocabCount;
+    private Integer knownVocabCount;
 }

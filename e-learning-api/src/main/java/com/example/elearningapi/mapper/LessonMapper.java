@@ -58,7 +58,9 @@ public class LessonMapper {
         lessonResponse.setId(lesson.getId());
         lessonResponse.setName(lesson.getName());
         lessonResponse.setThumbnail(lesson.getThumbnail());
+        lessonResponse.setDescription(lesson.getDescription());
         lessonResponse.setStatus(lesson.getStatus());
+        lessonResponse.setVocabCount(lesson.getLessonVocabs() != null ? lesson.getLessonVocabs().size() : 0);
         return lessonResponse;
     }
 }

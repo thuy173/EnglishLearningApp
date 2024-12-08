@@ -16,9 +16,9 @@ public interface LevelService {
 
     LevelResponse getById(Integer id);
 
-    void createData(LevelRequest levelRequest);
+    LevelResponse createData(LevelRequest levelRequest);
 
-    void updateData(Integer id, LevelRequest levelRequest);
+    LevelResponse updateData(Integer id, LevelRequest levelRequest);
 
     void deleteOne(Integer id);
 

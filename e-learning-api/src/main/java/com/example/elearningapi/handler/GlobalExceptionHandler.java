@@ -1,10 +1,8 @@
 package com.example.elearningapi.handler;
 
 import com.example.elearningapi.beans.response.MessageResponse;
-import com.example.elearningapi.exception.BadRequestException;
-import com.example.elearningapi.exception.ConflictException;
-import com.example.elearningapi.exception.EmptyException;
-import com.example.elearningapi.exception.ResourceNotFoundException;
+import com.example.elearningapi.exception.*;
+import org.apache.tomcat.websocket.AuthenticationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -34,5 +32,11 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     public @ResponseBody MessageResponse handleConflictException(ConflictException e) {
         return new MessageResponse(HttpStatus.CONFLICT.value(), e.getMessage());
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public @ResponseBody MessageResponse handleUnauthorizedException(UnauthorizedException e) {
+        return new MessageResponse(HttpStatus.UNAUTHORIZED.value(), e.getMessage());
     }
 }

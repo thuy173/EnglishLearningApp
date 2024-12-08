@@ -12,6 +12,10 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface UserCourseMapper {
 
+    @Mapping(target = "userId", source = "user.id")
+    @Mapping(target = "userName", source = "user.email")
+    @Mapping(target = "courseId", source = "course.id")
+    @Mapping(target = "courseName", source = "course.name")
     UserCourseResponse toUserCourseResponse(UserCourse userCourse);
 
     @Mapping(target = "lessonId", source = "userLesson.lesson.id")

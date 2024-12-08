@@ -19,6 +19,8 @@ public class Quiz {
 
     private String description;
 
+    private Integer levelId;
+
     private Long lessonId;
 
     private Integer timeLimit;
@@ -26,6 +28,8 @@ public class Quiz {
     private Integer passingScore;
 
     private List<Question> questions;
+
+    private Boolean isArchived = false;
 
     private LocalDateTime createdAt;
 

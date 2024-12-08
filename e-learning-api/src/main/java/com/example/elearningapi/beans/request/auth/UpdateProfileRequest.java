@@ -2,11 +2,10 @@ package com.example.elearningapi.beans.request.auth;
 
 import com.example.elearningapi.enums.GenderStatus;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
 public class UpdateProfileRequest {
@@ -17,7 +16,7 @@ public class UpdateProfileRequest {
 
     private GenderStatus gender;
 
-    private LocalDateTime dob;
+    private LocalDate dob;
 
     private String phoneNumber;
 }

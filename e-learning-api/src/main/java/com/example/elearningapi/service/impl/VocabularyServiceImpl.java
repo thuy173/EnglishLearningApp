@@ -1,6 +1,7 @@
 package com.example.elearningapi.service.impl;
 
-import com.example.elearningapi.beans.request.VocabularyRequest;
+import com.example.elearningapi.beans.request.vocab.ManyVocabRequest;
+import com.example.elearningapi.beans.request.vocab.VocabularyRequest;
 import com.example.elearningapi.beans.response.vocabulary.IpaResponse;
 import com.example.elearningapi.beans.response.vocabulary.VocabularyResponse;
 import com.example.elearningapi.entity.Vocabulary;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -68,12 +70,33 @@ public class VocabularyServiceImpl implements VocabularyService {
     }
 
     @Override
-    public void updateData(Long id, VocabularyRequest vocabularyRequest) {
+    public void createManyData(List<ManyVocabRequest> vocabularyRequests) {
+        List<Vocabulary> vocabularies = new ArrayList<>();
+
+        for (ManyVocabRequest vocabularyRequest : vocabularyRequests) {
+            Vocabulary vocabulary = new Vocabulary();
+
+            IpaResponse ipaResponse = ipaService.getWordDefinition(vocabularyRequest.getWord());
+
+            if (ipaResponse != null && ipaResponse.getPhonetic() != null) {
+                vocabularyRequest.setIpa(ipaResponse.getPhonetic());
+            }
+
+            vocabularyMapper.convertToManyReq(vocabulary, vocabularyRequest);
+            vocabularies.add(vocabulary);
+        }
+
+        vocabRepository.saveAll(vocabularies);
+    }
+
+    @Override
+    public VocabularyResponse updateData(Long id, VocabularyRequest vocabularyRequest) {
         Vocabulary existingVocab = vocabRepository.findById(id)
                 .orElseThrow(() -> new EmptyException("Course not found with id " + id));
 
         vocabularyMapper.convertToEntity(existingVocab, vocabularyRequest);
         vocabRepository.save(existingVocab);
+        return vocabularyMapper.convertToResponse(existingVocab);
     }
 
     @Override

@@ -17,6 +17,8 @@ public class CourseResponse {
     private String thumbnail;
     private Double price;
     private CourseStatus status;
+    private Integer categoryId;
+    private Integer levelId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
