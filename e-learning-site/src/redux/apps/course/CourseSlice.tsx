@@ -1,9 +1,20 @@
-import { fetchData, fetchDataById } from "@/redux/api/courseApi";
+import {
+  fetchData,
+  fetchDataById,
+  fetchLatest,
+  fetchMostEnrolled,
+  fetchRandom,
+} from "@/redux/api/courseApi";
 import CourseDto, { CourseDetailDto } from "@/types/feature/Course";
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAppThunk } from "@/utils/createThunk";
+import { addLoadingCases } from "@/utils/redux.utils";
+import { createSlice } from "@reduxjs/toolkit";
 
 interface InitialState {
   courses: CourseDto[];
+  courseLatest: CourseDto[];
+  courseMostEnrolled: CourseDto[];
+  courseRandom: CourseDto[];
   course: CourseDetailDto | null;
   loading: boolean;
   error: string | null;
@@ -11,105 +22,138 @@ interface InitialState {
 
 const initialState: InitialState = {
   courses: [],
+  courseLatest: [],
+  courseMostEnrolled: [],
+  courseRandom: [],
   course: null,
   loading: false,
   error: null,
 };
 
-export const fetchCoursesData = createAsyncThunk<
+interface FetchCoursesDataParams {
+  name: string;
+  categoryId: number;
+  levelId: number;
+  pageNumber: number;
+  pageSize: number;
+  sortField: string;
+  sortDirection: string;
+}
+
+export const fetchCoursesData = createAppThunk<
   CourseDto[],
-  {
-    name: string;
-    categoryId: number;
-    levelId: number;
-    pageNumber: number;
-    pageSize: number;
-    sortField: string;
-    sortDirection: string;
-  },
-  { rejectValue: string }
+  FetchCoursesDataParams
 >(
   "course/fetchData",
-  async (
-    {
+  async ({
+    name,
+    categoryId,
+    levelId,
+    pageNumber,
+    pageSize,
+    sortField,
+    sortDirection,
+  }) => {
+    const response = await fetchData(
       name,
       categoryId,
       levelId,
       pageNumber,
       pageSize,
       sortField,
-      sortDirection,
-    },
-    { rejectWithValue }
-  ) => {
-    try {
-      const response = await fetchData(
-        name,
-        categoryId,
-        levelId,
-        pageNumber,
-        pageSize,
-        sortField,
-        sortDirection
-      );
-      return response;
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      }
-      return rejectWithValue("Failed to fetch course");
-    }
-  }
+      sortDirection
+    );
+    return response;
+  },
+  { errorMessage: "Failed to fetch course" }
 );
 
-export const fetchCourseDataById = createAsyncThunk<
-  CourseDetailDto,
-  number,
-  { rejectValue: string }
->("course/fetchDataById", async (id, { rejectWithValue }) => {
-  try {
+export const fetchCourseDataById = createAppThunk<CourseDetailDto, number>(
+  "course/fetchDataById",
+  async (id) => {
     const response = await fetchDataById(id);
     return response;
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return rejectWithValue(error.message);
-    }
-    return rejectWithValue("Failed to fetch course by ID");
-  }
-});
+  },
+  { errorMessage: "Failed to fetch course by ID" }
+);
+
+export const fetchLatestData = createAppThunk<CourseDto[], void>(
+  "course/fetchLatest",
+  async () => {
+    const response = await fetchLatest();
+    return response;
+  },
+  { errorMessage: "Failed to fetch course latest." }
+);
+
+export const fetchMostEnrolledData = createAppThunk<CourseDto[], void>(
+  "course/fetchMostEnrolled",
+  async () => {
+    const response = await fetchMostEnrolled();
+    return response;
+  },
+  { errorMessage: "Failed to fetch course most enrolled." }
+);
+
+export const fetchRandomData = createAppThunk<CourseDto[], void>(
+  "course/fetchRandom",
+  async () => {
+    const response = await fetchRandom();
+    return response;
+  },
+  { errorMessage: "Failed to fetch course random." }
+);
 
 const courseSlice = createSlice({
   name: "course",
   initialState,
   reducers: {},
-  extraReducers: (course) => {
-    course
-      .addCase(fetchCoursesData.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchCoursesData.fulfilled, (state, action) => {
-        state.courses = action.payload;
+  extraReducers: (builder) => {
+    // Get all course
+    addLoadingCases(builder, fetchCoursesData, {
+      onFulfilled: (state, action) => {
+        if (action && action.payload) {
+          state.courses = action.payload;
+        }
         state.loading = false;
-      })
-      .addCase(fetchCoursesData.rejected, (state, action) => {
+      },
+    });
+    // Get latest course
+    addLoadingCases(builder, fetchLatestData, {
+      onFulfilled: (state, action) => {
+        if (action && action.payload) {
+          state.courseLatest = action.payload;
+        }
         state.loading = false;
-        state.error = action.payload as string;
-      })
-
-      // Fetch By ID
-      .addCase(fetchCourseDataById.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchCourseDataById.fulfilled, (state, action) => {
-        state.course = action.payload;
+      },
+    });
+    // Get most enroll course
+    addLoadingCases(builder, fetchMostEnrolledData, {
+      onFulfilled: (state, action) => {
+        if (action && action.payload) {
+          state.courseMostEnrolled = action.payload;
+        }
         state.loading = false;
-      })
-      .addCase(fetchCourseDataById.rejected, (state, action) => {
+      },
+    });
+    // Get random course
+    addLoadingCases(builder, fetchRandomData, {
+      onFulfilled: (state, action) => {
+        if (action && action.payload) {
+          state.courseRandom = action.payload;
+        }
         state.loading = false;
-        state.error = action.payload as string;
-      });
+      },
+    });
+    // Get one course
+    addLoadingCases(builder, fetchCourseDataById, {
+      onFulfilled: (state, action) => {
+        if (action && action.payload) {
+          state.course = action.payload;
+        }
+        state.loading = false;
+      },
+    });
   },
 });
 

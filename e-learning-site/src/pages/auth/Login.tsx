@@ -1,48 +1,79 @@
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAppDispatch } from "@/hooks/use-app-dispatch";
 import { useLocation, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { Formik, Form, ErrorMessage } from "formik";
-import { loginUser } from "@/redux/apps/auth/AuthSlice";
-import Logo from "../../../public/favicon.svg";
+import Logo from "../../assets/favicon.svg";
 import BackgroundImage from "../../assets/bgr-auth.jpg";
+import {
+  CredentialResponse,
+  GoogleLogin,
+  GoogleOAuthProvider,
+} from "@react-oauth/google";
+import { googleLoginUser, loginUser } from "@/redux/apps/auth/authSlice";
+import { useState } from "react";
+import ForgotPassword from "./Forgot";
+import { useAppSelector } from "@/hooks/use-app-selector";
+import { selectUserInformation } from "@/redux/apps/user/UserSelectors";
+import { fetchUserInfo } from "@/redux/apps/user/UserSlice";
 
 const Login = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const userInfo = useAppSelector(selectUserInformation);
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+  const [openForgotDialog, setOpenForgotDialog] = useState(false);
+
+  const handleGoogleLoginSuccess = async (response: CredentialResponse) => {
+    if (response.credential) {
+      try {
+        const result = await dispatch(
+          googleLoginUser({
+            googleToken: response.credential,
+          } as unknown as string)
+        );
+        if (googleLoginUser.fulfilled.match(result)) {
+          const redirectTo = location.state?.from || "/";
+          navigate(redirectTo);
+        }
+      } catch (error) {
+        console.error("Google login error:", error);
+      }
+    }
+  };
 
   const validationSchema = Yup.object().shape({
-    email: Yup.string().required("Tên đăng nhập là bắt buộc"),
+    email: Yup.string().required("Email là bắt buộc"),
     password: Yup.string().required("Mật khẩu là bắt buộc"),
   });
 
   const handleSubmit = async (values: { email: string; password: string }) => {
     try {
       const resultAction = await dispatch(loginUser(values));
-
       if (loginUser.fulfilled.match(resultAction)) {
         const redirectTo = location.state?.from || "/";
         navigate(redirectTo);
+        dispatch(fetchUserInfo());
+        localStorage.setItem("avt", userInfo?.avatar ?? "");
       } else {
         console.error("Login failed");
       }
     } catch (error) {
-      console.error("Login failed", error);
+      console.error("Login error details:", error);
     }
   };
 
   const handleHome = () => {
     navigate("/");
+  };
+
+  const handleOpenForgotDialog = () => {
+    setOpenForgotDialog(true);
   };
 
   return (
@@ -62,7 +93,7 @@ const Login = () => {
       >
         {({ values, handleChange, handleSubmit }) => (
           <Form onSubmit={handleSubmit} className="z-20 w-full max-w-md mx-4">
-            <Card className="w-full backdrop-blur-md bg-white/10 border border-white/30 shadow-xl">
+            <Card className="w-full p-6 backdrop-blur-md bg-white/10 border border-white/30 shadow-xl">
               <CardHeader className="items-center space-y-4">
                 <div className="bg-white rounded-full p-2">
                   <img
@@ -73,9 +104,6 @@ const Login = () => {
                   />
                 </div>
                 <CardTitle className="text-xl text-white">Đăng nhập</CardTitle>
-                <CardDescription className="text-white/80">
-                  Nhập thông tin đã được cung cấp để truy cập.
-                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid gap-4">
@@ -105,6 +133,7 @@ const Login = () => {
                       </Label>
                       <button
                         type="button"
+                        onClick={handleOpenForgotDialog}
                         className="text-sm text-white/80 hover:text-white underline"
                         tabIndex={-1}
                       >
@@ -134,12 +163,30 @@ const Login = () => {
                   >
                     Đăng nhập
                   </Button>
+                  <div className="flex justify-center">
+                    <GoogleOAuthProvider clientId={googleClientId}>
+                      <GoogleLogin onSuccess={handleGoogleLoginSuccess} />
+                    </GoogleOAuthProvider>
+                  </div>
+                  <button
+                    type="button"
+                    className="text-sm text-white/90 hover:text-white"
+                    onClick={() => navigate("/register")}
+                  >
+                    Bạn chưa có tài khoản? Đăng kí ngay nàooo
+                  </button>
                 </div>
               </CardContent>
             </Card>
           </Form>
         )}
       </Formik>
+      {openForgotDialog && (
+        <ForgotPassword
+          open={openForgotDialog}
+          onClose={() => setOpenForgotDialog(false)}
+        />
+      )}
     </section>
   );
 };

@@ -25,7 +25,7 @@ const LessonList = () => {
           name: "",
           courseId,
           pageNumber: 0,
-          pageSize: 15,
+          pageSize: 100,
           sortField: "id",
           sortDirection: "ASC",
         })
@@ -41,7 +41,7 @@ const LessonList = () => {
   const handleCloseChoiceWord = (confirm: boolean) => {
     setIsDialogOpen(false);
     if (confirm && selectedLessonId !== null) {
-      navigate(`/vocab/${selectedLessonId}`);
+      navigate(`/vocab/${selectedLessonId}?courseId=${courseId}`);
     }
   };
 
@@ -51,38 +51,60 @@ const LessonList = () => {
         <NoDataPage />
       ) : (
         <section>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16">
             {lessons.map((item) => (
               <div key={item.id} className="grid grid-cols-1 space-y-3">
                 <Card
-                  className="rounded-2xl shadow-none border-none pt-6 bg-gray-100"
+                  className="rounded-2xl shadow-none border-none p-6 bg-gray-100"
                   onClick={() => handleDetail(item.id)}
                 >
                   <CardContent className="flex-grow cursor-pointer">
-                    <div className="w-full h-0 pb-[76%] relative">
+                    <div className="w-full h-0 pb-[80%] relative">
                       <img
                         src={item.thumbnail}
                         alt={item.name}
-                        className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                        className="absolute inset-0 w-full h-full object-container rounded-lg"
                       />
                     </div>
                   </CardContent>
                 </Card>
                 <div className="space-y-3">
-                  <h2 className="text-center font-semibold text-xl line-clamp-2 cursor-pointer">
+                  <h2 className="text-center font-semibold text-xl line-clamp-1 cursor-pointer">
                     {item.name}
                   </h2>
                   <div className="flex items-center space-x-3 pl-2">
-                    <div className="relative w-full h-5 bg-gray-100 rounded-full">
+                    <div className="relative w-full h-5 bg-gray-50 rounded-full">
                       <div
-                        className="absolute top-0 left-0 h-5 bg-gray-300 rounded-full"
-                        style={{ width: `${(2 / 20) * 100}%` }}
+                        className="absolute top-0 left-0 h-5 bg-green-500 rounded-full"
+                        style={{
+                          width: `${
+                            item.vocabCount > 0
+                              ? (Number(item.knownVocabCount) /
+                                  Number(item.vocabCount)) *
+                                100
+                              : 0
+                          }%`,
+                        }}
                       ></div>
-                      <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                        {2}/{20}
+                      <div
+                        className={`absolute inset-0 flex items-center justify-center ${
+                          item.vocabCount > 0 &&
+                          item.knownVocabCount === item.vocabCount
+                            ? "text-white"
+                            : "text-gray-300"
+                        }`}
+                      >
+                        {item.knownVocabCount}/{item.vocabCount}
                       </div>
                     </div>
-                    <FaStar className="text-gray-400" size={30} />
+                    <FaStar
+                      className={
+                        item.knownVocabCount === item.vocabCount
+                          ? "text-yellow-400"
+                          : "text-gray-400"
+                      }
+                      size={30}
+                    />
                   </div>
                 </div>
               </div>

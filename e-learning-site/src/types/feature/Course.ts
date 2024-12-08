@@ -2,6 +2,9 @@ export default interface CourseDto {
   id: number;
   name: string;
   thumbnail: string;
+  description?: string;
+  totalLessons: number;
+  completedLessons: number;
 }
 
 export interface CourseDetailDto {

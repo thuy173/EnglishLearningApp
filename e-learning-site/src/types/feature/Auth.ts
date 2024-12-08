@@ -2,6 +2,12 @@ export default interface UserLoginDto {
   email: string;
   password: string;
 }
+
+export interface UserRegisterDto {
+  fullName: string;
+  email: string;
+  password: string;
+}
 export interface UserInfoDto {
   userId: string;
   email: string;
@@ -17,7 +23,7 @@ export interface ForgotPassDto {
 }
 
 export interface ResetPassDto {
-  id: string;
+  email: string;
   token: string;
   newPassword: string;
 }

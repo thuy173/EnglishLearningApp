@@ -3,4 +3,6 @@ export default interface LessonDto {
   name: string;
   thumbnail: string;
   status: string;
+  vocabCount: number;
+  knownVocabCount: number;
 }

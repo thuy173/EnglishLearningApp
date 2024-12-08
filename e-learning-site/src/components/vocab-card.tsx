@@ -32,7 +32,7 @@ const VocabCard: React.FC<VocabCardProps> = ({
       <span
         className={`text-lg font-semibold ${
           isSelected ? "text-[#1cb0f6]" : "text-gray-500"
-        }`}
+        } overflow-hidden text-ellipsis whitespace-normal leading-tight`}
       >
         {word} ({partOfSpeech})
       </span>

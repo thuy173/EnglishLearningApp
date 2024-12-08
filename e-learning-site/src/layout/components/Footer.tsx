@@ -18,7 +18,7 @@ const Footer = () => {
         <div className="container px-24">
           <div className="grid lg:flex justify-center text-center p-7 border-b-2 border-white border-opacity-15">
             <h3 className="mr-1 font-semibold">Seen mail address:</h3>
-            <a href="mailto://support@voca.vn" target="_blank" className="font-bold">support@voca.vn</a>
+            <a href="mailto://support@voca.vn" target="_blank" className="font-bold">support@learning.edu.vn</a>
           </div>
         </div>
         <div className="container py-6">
@@ -28,7 +28,7 @@ const Footer = () => {
                 <h3 className="text-2xl">Học mọi lúc, mọi nơi</h3>
                 <p>
                   Tận dụng hiệu quả từng phút giây để học tập tiếng Anh với ứng
-                  dụng VOCA dành cho iPhone và Android bạn nhé.
+                  dụng dành cho iPhone và Android bạn nhé.
                 </p>
               </div>
               <div className="lg:p-4 lg:w-2/6 lg:mt-0 mt-6">

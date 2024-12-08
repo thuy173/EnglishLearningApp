@@ -19,9 +19,10 @@ const getColor = () => {
 
 interface LevelCardProps {
   title: string;
-  description: string;
+  description?: string;
   buttonText: string;
   imageUrl: string;
+  onClick?: () => void;
 }
 
 const LevelCard: React.FC<LevelCardProps> = ({
@@ -29,6 +30,7 @@ const LevelCard: React.FC<LevelCardProps> = ({
   description,
   buttonText,
   imageUrl,
+  onClick,
 }) => {
   const [backgroundColor, setBackgroundColor] = useState<string>("");
 
@@ -38,18 +40,19 @@ const LevelCard: React.FC<LevelCardProps> = ({
 
   return (
     <div
-      className="rounded-3xl py-4 px-8 max-w-sm mx-auto relative shadow-lg"
+      className="rounded-3xl py-4 px-8 max-w-sm mx-auto relative shadow-lg flex flex-col justify-between h-[260px] lg:h-[380px]"
       style={{ backgroundColor }}
     >
-      <div className="flex justify-center -mt-36">
+      <div className="flex justify-center -mt-32">
         <img src={imageUrl} alt={title} className="object-cover" />
       </div>
       <div className="text-center mt-1">
-        <h2 className="text-white text-2xl font-bold mb-2">{title}</h2>
-        <p className="text-white mb-4">{description}</p>
+        <h2 className="text-white text-2xl font-bold mb-2 line-clamp-2">{title}</h2>
+        <p className="text-white mb-4 line-clamp-2">{description}</p>
         <Button
           className="bg-white hover:bg-white rounded-lg w-full font-semibold"
           style={{ color: backgroundColor }}
+          onClick={onClick}
         >
           {buttonText}
         </Button>

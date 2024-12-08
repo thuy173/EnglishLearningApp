@@ -1,12 +1,19 @@
-import { fetchDataById, fetchShortDataById } from "@/redux/api/vocabApi";
+import {
+  fetchDataById,
+  fetchShortDataById,
+  userVocabEvaluate,
+} from "@/redux/api/vocabApi";
 import VocabDto, { VocabDetailDto, VocabShortDto } from "@/types/feature/Vocab";
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAppThunk } from "@/utils/createThunk";
+import { addLoadingCases } from "@/utils/redux.utils";
+import { createSlice } from "@reduxjs/toolkit";
 
 interface InitialState {
   lessonVocab: VocabDto | null;
   vocabularies: VocabDetailDto[];
   shortVocab: VocabShortDto[];
   vocabulary: VocabDetailDto | null;
+  evaluationResult: string | null;
   loading: boolean;
   error: string | null;
 }
@@ -16,78 +23,74 @@ const initialState: InitialState = {
   vocabularies: [],
   shortVocab: [],
   vocabulary: null,
+  evaluationResult: null,
   loading: false,
   error: null,
 };
 
-export const fetchVocabDataByLessonId = createAsyncThunk<
-  VocabDto,
-  number,
-  { rejectValue: string }
->("vocab/fetchVocabDataByLessonId", async (lessonId, { rejectWithValue }) => {
-  try {
+export const fetchVocabDataByLessonId = createAppThunk<VocabDto, number>(
+  "vocab/fetchVocabDataByLessonId",
+  async (lessonId) => {
     const response = await fetchDataById(lessonId);
     return response;
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return rejectWithValue(error.message);
-    }
-    return rejectWithValue("Failed to fetch vocab by lesson ID");
-  }
-});
-export const fetchShortVocabDataByLessonId = createAsyncThunk<
-VocabDto,
-  number,
-  { rejectValue: string }
->(
+  },
+  { errorMessage: "Failed to fetch vocab by lesson ID" }
+);
+
+export const fetchShortVocabDataByLessonId = createAppThunk<VocabDto, number>(
   "vocab/fetchShortVocabDataByLessonId",
-  async (lessonId, { rejectWithValue }) => {
-    try {
-      const response = await fetchShortDataById(lessonId);
-      return response;
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      }
-      return rejectWithValue("Failed to fetch vocab short by lesson ID");
-    }
-  }
+  async (lessonId) => {
+    const response = await fetchShortDataById(lessonId);
+    return response;
+  },
+  { errorMessage: "Failed to fetch vocab short by lesson ID" }
+);
+
+export const evaluateUserVocab = createAppThunk<
+  string,
+  { vocabId: number; word: string }
+>(
+  "vocab/evaluateUserVocab",
+  async ({ vocabId, word }) => {
+    const response = await userVocabEvaluate(vocabId, word);
+    return response;
+  },
+  { errorMessage: "Failed to evaluate vocabulary" }
 );
 
 const vocabSlice = createSlice({
   name: "vocab",
   initialState,
   reducers: {},
-  extraReducers: (vocab) => {
-    vocab
-      // fetch by lesson id
-      .addCase(fetchVocabDataByLessonId.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchVocabDataByLessonId.fulfilled, (state, action) => {
-        state.lessonVocab = action.payload;
-        state.vocabularies = action.payload.vocabularies;
+  extraReducers: (builder) => {
+    // Get by lesson id
+    addLoadingCases(builder, fetchVocabDataByLessonId, {
+      onFulfilled: (state, action) => {
+        if (action && action.payload) {
+          state.lessonVocab = action.payload;
+          state.vocabularies = action.payload.vocabularies;
+        }
         state.loading = false;
-      })
-      .addCase(fetchVocabDataByLessonId.rejected, (state, action) => {
+      },
+    });
+    // Get short by lesson id
+    addLoadingCases(builder, fetchShortVocabDataByLessonId, {
+      onFulfilled: (state, action) => {
+        if (action && action.payload) {
+          state.shortVocab = action.payload.vocabularies;
+        }
         state.loading = false;
-        state.error = action.payload as string;
-      })
-
-      // fetch short by lesson id
-      .addCase(fetchShortVocabDataByLessonId.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchShortVocabDataByLessonId.fulfilled, (state, action) => {
-        state.shortVocab = action.payload.vocabularies;
+      },
+    });
+    // Evaluate user vocab
+    addLoadingCases(builder, evaluateUserVocab, {
+      onFulfilled: (state, action) => {
+        if (action && action.payload) {
+          state.evaluationResult = action.payload;
+        }
         state.loading = false;
-      })
-      .addCase(fetchShortVocabDataByLessonId.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      });
+      },
+    });
   },
 });
 

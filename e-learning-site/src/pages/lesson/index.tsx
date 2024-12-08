@@ -7,6 +7,7 @@ import { useAppSelector } from "@/hooks/use-app-selector";
 import { selectOneCourse } from "@/redux/apps/course/CourseSelectors";
 import { useEffect } from "react";
 import { fetchCourseDataById } from "@/redux/apps/course/CourseSlice";
+import { Helmet } from "react-helmet-async";
 
 const LessonPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -21,19 +22,24 @@ const LessonPage: React.FC = () => {
   }, [dispatch, courseId]);
 
   return (
-    <section>
-      {course && <Banner course={course} />}
-      <div className="container grid grid-cols-1 md:grid-cols-3 gap-4 mb-16">
-        <div className="md:col-span-2 px-12">
-          <LessonList />
-        </div>
-        {course && (
-          <div className="md:col-span-1">
-            <InfoLesson course={course}/>
+    <>
+      <Helmet>
+        <title> Lesson </title>
+      </Helmet>
+      <section>
+        {course && <Banner course={course} />}
+        <div className="container grid grid-cols-1 md:grid-cols-3 gap-4 mb-16">
+          <div className="md:col-span-2 px-12">
+            <LessonList />
           </div>
-        )}
-      </div>
-    </section>
+          {course && (
+            <div className="md:col-span-1">
+              <InfoLesson course={course} />
+            </div>
+          )}
+        </div>
+      </section>
+    </>
   );
 };
 

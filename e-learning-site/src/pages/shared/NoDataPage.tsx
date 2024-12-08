@@ -3,7 +3,7 @@ import NoDataImage from "../../assets/noData.jpg";
 
 const NoDataPage: React.FC = () => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-24 text-center">
+    <div className="flex flex-col items-center justify-center min-h-24 text-center overflow-hidden">
       <div>
         <img
           src={NoDataImage}

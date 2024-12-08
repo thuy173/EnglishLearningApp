@@ -2,6 +2,7 @@ import { IconType } from "react-icons";
 import {
   FcBookmark,
   FcGraduationCap,
+  FcIdea,
   FcShop,
   FcWorkflow,
 } from "react-icons/fc";
@@ -22,7 +23,7 @@ const headerConfig: HeaderConfigItem[] = [
   },
   {
     title: "Cá nhân",
-    path: "/profile",
+    path: "/profile/setting",
     icon: FcBookmark,
   },
   {
@@ -30,6 +31,11 @@ const headerConfig: HeaderConfigItem[] = [
     path: "/library",
     icon: FcGraduationCap,
     children: [],
+  },
+  {
+    title: "Kiểm tra",
+    path: "/level-choice",
+    icon: FcIdea ,
   },
 
   {

@@ -1,6 +1,8 @@
 import { fetchData, fetchDataById } from "@/redux/api/lessonApi";
 import LessonDto from "@/types/feature/Lesson";
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAppThunk } from "@/utils/createThunk";
+import { addLoadingCases } from "@/utils/redux.utils";
+import { createSlice } from "@reduxjs/toolkit";
 
 interface InitialState {
   lessons: LessonDto[];
@@ -16,90 +18,70 @@ const initialState: InitialState = {
   error: null,
 };
 
-export const fetchLessonsData = createAsyncThunk<
-  LessonDto[],
-  {
-    name: string;
-    courseId: number;
-    pageNumber: number;
-    pageSize: number;
-    sortField: string;
-    sortDirection: string;
-  },
-  { rejectValue: string }
->(
+interface FetchLessonsParams {
+  name: string;
+  courseId: number;
+  pageNumber: number;
+  pageSize: number;
+  sortField: string;
+  sortDirection: string;
+}
+
+export const fetchLessonsData = createAppThunk<LessonDto[], FetchLessonsParams>(
   "lesson/fetchData",
-  async (
-    { name, courseId, pageNumber, pageSize, sortField, sortDirection },
-    { rejectWithValue }
-  ) => {
-    try {
-      const response = await fetchData(
-        name,
-        courseId,
-        pageNumber,
-        pageSize,
-        sortField,
-        sortDirection
-      );
-      return response;
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      }
-      return rejectWithValue("Failed to fetch lesson");
-    }
-  }
+  async ({
+    name,
+    courseId,
+    pageNumber,
+    pageSize,
+    sortField,
+    sortDirection,
+  }) => {
+    const response = await fetchData(
+      name,
+      courseId,
+      pageNumber,
+      pageSize,
+      sortField,
+      sortDirection
+    );
+    return response;
+  },
+  { errorMessage: "Failed to fetch lesson" }
 );
 
-export const fetchLessonDataById = createAsyncThunk<
-  LessonDto,
-  number,
-  { rejectValue: string }
->("lesson/fetchDataById", async (id, { rejectWithValue }) => {
-  try {
+export const fetchLessonDataById = createAppThunk<LessonDto, number>(
+  "lesson/fetchDataById",
+  async (id) => {
     const response = await fetchDataById(id);
     return response;
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return rejectWithValue(error.message);
-    }
-    return rejectWithValue("Failed to fetch lesson by ID");
-  }
-});
+  },
+  { errorMessage: "Failed to fetch lesson by ID" }
+);
 
 const lessonSlice = createSlice({
   name: "lesson",
   initialState,
   reducers: {},
-  extraReducers: (lesson) => {
-    lesson
-      .addCase(fetchLessonsData.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchLessonsData.fulfilled, (state, action) => {
-        state.lessons = action.payload;
+  extraReducers: (builder) => {
+    // Get all
+    addLoadingCases(builder, fetchLessonsData, {
+      onFulfilled: (state, action) => {
+        if (action && action.payload) {
+          state.lessons = action.payload;
+        }
         state.loading = false;
-      })
-      .addCase(fetchLessonsData.rejected, (state, action) => {
+      },
+    });
+    // Get one
+    addLoadingCases(builder, fetchLessonDataById, {
+      onFulfilled: (state, action) => {
+        if (action && action.payload) {
+          state.lesson = action.payload;
+        }
         state.loading = false;
-        state.error = action.payload as string;
-      })
-      
-      // Fetch By ID
-      .addCase(fetchLessonDataById.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchLessonDataById.fulfilled, (state, action) => {
-        state.lesson = action.payload;
-        state.loading = false;
-      })
-      .addCase(fetchLessonDataById.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      });
+      },
+    });
   },
 });
 

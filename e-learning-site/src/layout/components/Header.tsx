@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { IoMenu, IoSearch } from "react-icons/io5";
+import { IoMenu } from "react-icons/io5";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -12,18 +11,25 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import headerConfig from "../header-config";
 import Nav from "./Nav";
-import Logo from "../../../public/favicon.svg";
+import Logo from "../../assets/favicon.svg";
 import { useAppSelector } from "@/hooks/use-app-selector";
-import { FaRegUser } from "react-icons/fa";
 import Cookies from "js-cookie";
 import { persistor } from "@/redux/store";
-import { logoutUser } from "@/redux/apps/auth/AuthSlice";
+import { logoutUser } from "@/redux/apps/auth/authSlice";
 import { useAppDispatch } from "@/hooks/use-app-dispatch";
 import { selectCategories } from "@/redux/apps/category/CategorySelectors";
 import { fetchCategoriesData } from "@/redux/apps/category/CategorySlice";
+import SearchBar from "@/components/search-bar";
+import { API_CONFIG } from "@/types/feature/Config";
+import avtDefault from "../../assets/default.png";
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
@@ -34,6 +40,8 @@ const Header: React.FC = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+  const avatar = localStorage.getItem("avt");
+
   const toggleDrawer = () => {
     setIsDrawerOpen(!isDrawerOpen);
   };
@@ -42,8 +50,8 @@ const Header: React.FC = () => {
   };
 
   const handleLogout = () => {
-    Cookies.remove("accessToken");
-    Cookies.remove("refreshToken");
+    Cookies.remove(API_CONFIG.tokenCookieName);
+    Cookies.remove(API_CONFIG.refreshTokenCookieName);
     persistor.purge();
     dispatch(logoutUser());
     navigate("/");
@@ -60,7 +68,7 @@ const Header: React.FC = () => {
         pageNumber: 0,
         pageSize: 10,
         sortField: "id",
-        sortDirection: "DESC",
+        sortDirection: "ASC",
       })
     );
   }, [dispatch]);
@@ -89,7 +97,7 @@ const Header: React.FC = () => {
                             : "border-2 border-transparent",
                           "bg-transparent px-2 py-1 rounded-md hover:bg-[#ddf4ff] focus:bg-[#ddf4ff] hover:border-2 hover:border-[#84d8ff] text-gray-700"
                         )}
-                        onClick={() => navigate('/library')}
+                        onClick={() => navigate("/library")}
                       >
                         {item.icon && <item.icon className="w-5 h-5 mr-2" />}
                         <span className="text-base font-semibold">
@@ -111,7 +119,11 @@ const Header: React.FC = () => {
                                   )}
                                 >
                                   {child.icon && (
-                                    <img src={child.icon} alt="Vocabulary" className="w-10 h-10 rounded-md shrink-0" />
+                                    <img
+                                      src={child.icon}
+                                      alt={child.name}
+                                      className="w-10 h-10 rounded-md shrink-0"
+                                    />
                                   )}
                                   <div className="text-sm font-semibold">
                                     {child.name}
@@ -153,21 +165,20 @@ const Header: React.FC = () => {
         </div>
         <div className="hidden lg:flex items-center space-x-4">
           <div className="relative">
-            <Input
-              type="text"
-              placeholder="Tìm kiếm khóa học..."
-              className="pl-10 pr-4 py-1 rounded-full bg-white focus:outline-none"
+            <SearchBar
+              placeholder="Tìm kiếm..."
+              minChars={2}
+              debounceMs={300}
             />
-            <IoSearch className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
           </div>
           {isAuthenticated ? (
             <div className="relative">
               <Avatar
-                className="bg-indigo-600 cursor-pointer"
+                className="border-transparent cursor-pointer"
                 onClick={toggleDropdown}
               >
                 <AvatarFallback>
-                  <FaRegUser size={20} />
+                  <img src={avatar || avtDefault} className="w-10" />
                 </AvatarFallback>
               </Avatar>
               {isDropdownOpen && (
@@ -182,14 +193,28 @@ const Header: React.FC = () => {
               )}
             </div>
           ) : (
-            <button className="font-medium hover:text-gray-900" onClick={login}>
-              Login | Register
-            </button>
+            <>
+              <button
+                className="font-medium hover:text-gray-900 pr-3 hover:font-bold"
+                onClick={login}
+              >
+                Đăng nhập
+              </button>
+              |
+              <button
+                className="font-medium hover:text-gray-900 hover:font-bold"
+                onClick={() => navigate("/register")}
+              >
+                Đăng kí
+              </button>
+            </>
           )}
         </div>
       </div>
       <Sheet open={isDrawerOpen} onOpenChange={toggleDrawer}>
         <SheetContent side={"right"}>
+          <SheetTitle>Vui học tiếng anh!</SheetTitle>
+          <SheetDescription />
           <div className="p-4">
             <Nav toggleDrawer={toggleDrawer} />
           </div>

@@ -1,20 +1,20 @@
 import { Button } from "@/components/ui/button";
+import { ButtonSlideBar } from "@/types/ui/SlideBarProfile";
 
 interface SideBarProps {
   activeButton: string;
-  setActiveButton: React.Dispatch<React.SetStateAction<string>>;
+  setActiveButton: (button: ButtonSlideBar) => void;
 }
-const SideBar: React.FC<SideBarProps> = ({ activeButton, setActiveButton }) => {
-  const buttons = ["Cài đặt", "Từ điển", "Lịch sử"];
 
+const SideBar: React.FC<SideBarProps> = ({ activeButton, setActiveButton }) => {
   return (
     <section>
-      <div>
-        {buttons.map((item, index) => (
+      <div className="grid grid-cols-2 gap-2 md:grid-cols-1">
+        {Object.values(ButtonSlideBar).map((item, index) => (
           <div key={index} className="mb-2">
             <Button
               onClick={() => setActiveButton(item)}
-              className={`w-2/3 ${
+              className={`w-full md:w-5/6 ${
                 activeButton === item
                   ? "bg-[#ddf4ff] border-2 border-[#84d8ff] text-[#1cb0f6] hover:bg-[#ddf4ff]"
                   : "bg-transparent text-gray-400 hover:bg-gray-200"

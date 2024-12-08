@@ -23,3 +23,17 @@ export interface VocabShortDto {
   word: string;
   image: string;
 }
+
+export interface UserVocabDto {
+  vocabId: number;
+  word: string;
+}
+
+export interface FetchUserVocabProps {
+  word?: string;
+  pageNumber: number;
+  pageSize: number;
+  sortField: string;
+  sortDirection: string;
+}
+

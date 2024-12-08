@@ -1,5 +1,6 @@
 import MethodImg from "../../../assets/method.svg";
 import ButtonCustom from "@/components/button-custom";
+import { BsJournalText } from "react-icons/bs";
 
 const Banner = () => {
   return (
@@ -13,17 +14,17 @@ const Banner = () => {
             <p className="">
               Với sứ mệnh giáo dục là giúp cho bạn học Việt Nam xóa bỏ rào cản
               Anh ngữ. Chính vì thế, trong suốt hành trình 10 năm qua, đội ngũ
-              sư phạm VOCA đã không ngừng nghiên cứu và đổi phương pháp học trên
+              sư phạm đã không ngừng nghiên cứu và đổi phương pháp học trên
               hệ thống để giúp bạn học tiếp cận tiếng Anh dễ dàng, hiệu quả và
               thú vị hơn.
             </p>
             <p>
               Hãy cùng khám phá xem phương pháp đó cụ thể là những gì, và vì sao
-              VOCA có thể giúp bạn cải thiện khả năng tiếng Anh hiệu quả nhất
+              có thể giúp bạn cải thiện khả năng tiếng Anh hiệu quả nhất
               nhé.
             </p>
           </div>
-          <ButtonCustom onClick={() => {}} className="ml-10 w-1/2" title="Học thử" />
+          <ButtonCustom onClick={() => {}} className="ml-10 w-1/2" title="Học thử" icon={<BsJournalText />}/>
         </div>
         <div className="col-span-1 flex justify-center items-center">
           <img src={MethodImg} alt="Approach" />

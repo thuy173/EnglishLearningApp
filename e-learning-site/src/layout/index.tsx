@@ -11,12 +11,20 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   const hideFooter =
     location.pathname === "/library" ||
+    location.pathname === "/level-choice" ||
     matchPath("/course/:id", location.pathname) ||
     matchPath("/lesson/:id", location.pathname) ||
     matchPath("/vocab/:id", location.pathname) ||
-    location.pathname === "/profile";
+    matchPath("/quiz/:id", location.pathname) ||
+    matchPath("/level-choice/:id/quiz", location.pathname) ||
+    matchPath("/attempt/:id/result", location.pathname) ||
+    matchPath("/profile/:section", location.pathname);
 
-  const hideHeader = matchPath("/vocab/:id", location.pathname);
+  const hideHeader =
+    location.pathname === "/level-choice" ||
+    matchPath("/quiz/:id", location.pathname) ||
+    matchPath("/attempt/:id/result", location.pathname) ||
+    matchPath("/vocab/:id", location.pathname);
 
   return (
     <div className="flex flex-col min-h-screen overflow-x-hidden">

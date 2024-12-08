@@ -7,15 +7,22 @@ import { LuFlipVertical2 } from "react-icons/lu";
 import { useAppDispatch } from "@/hooks/use-app-dispatch";
 import { useAppSelector } from "@/hooks/use-app-selector";
 import { selectVocabularies } from "@/redux/apps/vocab/VocabSelectors";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { fetchVocabDataByLessonId } from "@/redux/apps/vocab/VocabSlice";
 import { VocabDetailDto } from "@/types/feature/Vocab";
+import InputEvaluateComponent from "./InputEvaluate";
+import { FcNext, FcPrevious } from "react-icons/fc";
+import NoDataPage from "@/pages/shared/NoDataPage";
 
 const WordCard: React.FC = () => {
   const dispatch = useAppDispatch();
   const vocab = useAppSelector(selectVocabularies);
   const { id } = useParams();
   const lessonId = parseInt(id ?? "1", 10);
+
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const queryCourseId = parseInt(searchParams.get('courseId') ?? "1", 10);
 
   const { speak } = useSpeechSynthesis();
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -47,21 +54,39 @@ const WordCard: React.FC = () => {
     setRotateIndex((prev) => (prev + 1) % 4);
   };
 
+  const getCurrentFace = (rotateIndex: number) => {
+    const faces = ["front", "right", "back", "left"];
+    return faces[rotateIndex % 4];
+  };
+
   const handleNextVocab = () => {
     setRotateIndex(0);
     setCurrentVocabIndex((prev) => (prev + 1) % filteredVocab.length);
   };
 
+  const handlePreviousVocab = () => {
+    setRotateIndex(0);
+    setCurrentVocabIndex((prev) =>
+      prev === 0 ? filteredVocab.length - 1 : prev - 1
+    );
+  };
+
+  const handleCorrectAnswer = () => {
+    handleSpeak();
+  };
+
   if (!filteredVocab || filteredVocab.length === 0) {
-    return <div>Chưa có từ vựng</div>;
+    return <NoDataPage />;
   }
 
   const currentVocab = filteredVocab[currentVocabIndex];
 
+  const isLastVocab = currentVocabIndex === filteredVocab.length - 1;
+
   const cardFaces = [
     {
       key: "front",
-      title: currentVocab.word || "Hello",
+      title: currentVocab.word,
       content: (
         <>
           <div className="flex flex-col space-y-3">
@@ -113,9 +138,11 @@ const WordCard: React.FC = () => {
               {currentVocab.ipa}
             </p>
           </div>
-          <div className="py-3">
+          <div className="py-3 w-full overflow-y-auto max-h-32">
             <h2 className="text-lg font-semibold text-[#1cb0f6]">Ví dụ:</h2>
-            <p>{currentVocab.example}</p>
+            <p className="break-words whitespace-pre-wrap">
+              {currentVocab.example}
+            </p>
           </div>
         </div>
       ),
@@ -130,7 +157,7 @@ const WordCard: React.FC = () => {
             <h2 className="text-lg font-semibold">Từ đồng nghĩa:</h2>
             <p>{currentVocab.synonym}</p>
           </div>
-          <div className="flex justify-center items-center space-x-2">
+          <div className="md:flex justify-center items-center space-x-2">
             <h2 className="text-lg font-semibold">Cụm từ: </h2>
             <span>{currentVocab.collocation}</span>
           </div>
@@ -152,8 +179,8 @@ const WordCard: React.FC = () => {
   ];
 
   return (
-    <section>
-      <div className="flex my-24 px-48 justify-center items-center space-x-4">
+    <section className="pb-20">
+      <div className="flex my-24 px-5 md:px-24 lg:px-48 justify-center items-center space-x-4">
         <div style={styles.perspective}>
           <div
             style={{
@@ -193,8 +220,34 @@ const WordCard: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="flex justify-center items-center mb-6">
-        <Button onClick={handleNextVocab}>Từ tiếp theo</Button>
+      {getCurrentFace(rotateIndex) !== "left" && (
+        <div className="flex justify-center items-center py-5">
+          <div className="md:w-1/2">
+            <InputEvaluateComponent
+              vocabId={currentVocab.id}
+              lessonId={lessonId}
+              courseId={queryCourseId}
+              onCorrectAnswer={handleCorrectAnswer}
+              isLastVocab={isLastVocab}
+            />
+          </div>
+        </div>
+      )}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+        <div className="flex justify-center items-center gap-4 md:gap-20 py-5">
+          <Button
+            onClick={handlePreviousVocab}
+            className="h-10 w-10 bg-transparent hover:bg-transparent shadow-none text-gray-400 border border-gray-300 rounded-full border-b-4"
+          >
+            <FcPrevious />
+          </Button>
+          <Button
+            className="h-10 w-10 bg-transparent hover:bg-transparent shadow-none text-gray-400 border border-gray-300 rounded-full border-b-4"
+            onClick={handleNextVocab}
+          >
+            <FcNext />
+          </Button>
+        </div>
       </div>
     </section>
   );

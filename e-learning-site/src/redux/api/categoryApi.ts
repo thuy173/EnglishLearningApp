@@ -1,5 +1,5 @@
 import CategoryDto from "@/types/feature/Category";
-import axiosInstance from "./agent";
+import httpClient from "./agent";
 
 interface FetchParams {
   name?: string;
@@ -27,16 +27,16 @@ export const fetchData = async (
       params.name = name;
     }
 
-    const response = await axiosInstance.get("/categories", { params });
-    return response.data.content;
+    const response = await httpClient.get<{ content: CategoryDto[] }>("/categories", { params });
+    return response.content;
   } catch (error) {
     throw new Error(`Failed to fetch category: ${error}`);
   }
 };
 export const fetchDataById = async (id: number): Promise<CategoryDto> => {
   try {
-    const response = await axiosInstance.get(`/categories/${id}`);
-    return response.data;
+    const response = await httpClient.get<CategoryDto>(`/categories/${id}`);
+    return response;
   } catch (error) {
     throw new Error(`Failed to fetch category: ${error}`);
   }

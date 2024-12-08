@@ -8,11 +8,13 @@ import { fetchCoursesData } from "@/redux/apps/course/CourseSlice";
 import { useNavigate, useParams } from "react-router-dom";
 import CourseDto from "@/types/feature/Course";
 import NoDataPage from "@/pages/shared/NoDataPage";
+import { enroll } from "@/redux/apps/progress/ProgressSlice";
 
 const CourseInCategory = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const courses = useAppSelector(selectCourses);
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
   const { id } = useParams();
   const categoryId = parseInt(id ?? "1", 10);
   const [pageNumber, setPageNumber] = useState(0);
@@ -20,6 +22,15 @@ const CourseInCategory = () => {
 
   const handleSeeMore = () => {
     setPageNumber((prev) => prev + 1);
+  };
+
+  const handleCourseClick = (courseId: number) => {
+    if (!isAuthenticated) {
+      navigate("/login");
+    } else {
+      dispatch(enroll({ courseId }));
+      navigate(`/lesson/${courseId}`);
+    }
   };
 
   useEffect(() => {
@@ -64,13 +75,13 @@ const CourseInCategory = () => {
             <h2 className="text-xl font-semibold text-gray-500">
               Nhóm khóa học:
             </h2>
-            <div className="mt-5 overflow-hidden overflow-y-auto max-h-96 pr-3">
+            <div className="mt-5 overflow-hidden overflow-y-auto max-h-96 pr-3 mb-16">
               <div className="space-y-4">
                 {allCourses.map((item) => (
                   <div
                     key={item.id}
                     className="grid grid-cols-6 p-5 space-x-5 justify-center rounded-xl bg-gray-100"
-                    onClick={() => navigate(`/lesson/${item.id}`)}
+                    onClick={() => handleCourseClick(item.id)}
                   >
                     <div className="col-span-1 cursor-pointer">
                       <img
@@ -80,11 +91,11 @@ const CourseInCategory = () => {
                       />
                     </div>
                     <div className="col-span-2 flex items-center text-lg font-semibold uppercase cursor-pointer">
-                      {item.name}
+                      <p className="line-clamp-2">{item.name}</p>
                     </div>
                     <div className="col-span-3 flex items-center h-full">
                       <div className="w-full">
-                        <ProgressBar current={14} total={120} />
+                        <ProgressBar current={item.completedLessons} total={item.totalLessons} />
                       </div>
                     </div>
                   </div>

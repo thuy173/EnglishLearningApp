@@ -6,4 +6,6 @@ export const selectVocabularies = (state: RootState) => state.vocab.vocabularies
 
 export const selectShortVocab = (state: RootState) => state.vocab.shortVocab;
 
+export const selectEvaluationResult = (state: RootState) => state.vocab.evaluationResult;
+
 export const selectOneVocab = (state: RootState) => state.vocab.vocabulary;

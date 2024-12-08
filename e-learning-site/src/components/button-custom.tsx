@@ -1,16 +1,20 @@
-import React, { ButtonHTMLAttributes } from "react";
+import React, { ButtonHTMLAttributes, ReactNode } from "react";
 import { Button } from "./ui/button";
 
 interface ButtonCustomProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  onClick: () => void;
+  onClick?: () => void;
   className?: string;
   title: string;
+  icon?: ReactNode;
+  type?: "button" | "submit" | "reset";
 }
 
 const ButtonCustom: React.FC<ButtonCustomProps> = ({
   onClick,
   className,
   title,
+  icon,
+  type,
   ...props
 }) => {
   return (
@@ -18,6 +22,7 @@ const ButtonCustom: React.FC<ButtonCustomProps> = ({
       {/* Invisible element to maintain space */}
       <div className="invisible">
         <Button
+          type={type}
           className={`
             bg-white 
             text-center 
@@ -35,10 +40,11 @@ const ButtonCustom: React.FC<ButtonCustomProps> = ({
           {title}
         </Button>
       </div>
-      
+
       {/* Actual button with absolute positioning */}
       <Button
         onClick={onClick}
+        type={type}
         className={`
           absolute
           top-0
@@ -64,7 +70,8 @@ const ButtonCustom: React.FC<ButtonCustomProps> = ({
         `}
         {...props}
       >
-        {title}
+        <span className="block md:hidden text-xl">{icon}</span>
+        <span className="hidden md:block">{title}</span>
       </Button>
     </div>
   );

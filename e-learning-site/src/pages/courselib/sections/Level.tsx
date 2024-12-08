@@ -1,5 +1,9 @@
 import LevelCard from "@/components/level-card";
-import levelImage from "../../../assets/level.png";
+import random1Image from "../../../assets/random-course1.png";
+import random2Image from "../../../assets/random-course2.png";
+import random3Image from "../../../assets/random-course3.png";
+import random4Image from "../../../assets/random-course4.png";
+
 import {
   Carousel,
   CarouselContent,
@@ -8,49 +12,71 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
+import { useAppDispatch } from "@/hooks/use-app-dispatch";
+import { useAppSelector } from "@/hooks/use-app-selector";
+import { selectCourseRandom } from "@/redux/apps/course/CourseSelectors";
+import { useEffect } from "react";
+import { fetchRandomData } from "@/redux/apps/course/CourseSlice";
+import { useNavigate } from "react-router-dom";
+import { enroll } from "@/redux/apps/progress/ProgressSlice";
 
 const Level = () => {
-  const cardDataArray = [
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const courseRandom = useAppSelector(selectCourseRandom);
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
+
+  useEffect(() => {
+    dispatch(fetchRandomData());
+  }, [dispatch]);
+
+  const defaultCardData = [
     {
-      title: "Học Theo Cấp Độ",
-      description:
-        "Giúp bạn toàn diện 4 kỹ năng Anh ngữ theo lộ trình 7 cấp độ CEFR từ A0 đến C2",
       buttonText: "Bắt Đầu Ngay",
-      imageUrl: levelImage,
+      imageUrl: random1Image,
     },
     {
-      title: "Khóa Học Từ Vựng",
-      description:
-        "Tập trung vào việc phát triển vốn từ vựng tiếng Anh, từ cơ bản đến nâng cao.",
       buttonText: "Tham Gia Ngay",
-      imageUrl: levelImage,
+      imageUrl: random3Image,
     },
     {
-      title: "Luyện Kỹ Năng Nghe",
-      description:
-        "Phát triển kỹ năng nghe hiểu tiếng Anh qua các bài tập và bài nghe thực tế.",
       buttonText: "Bắt Đầu Luyện Ngay",
-      imageUrl: levelImage,
+      imageUrl: random2Image,
     },
     {
-      title: "Luyện Kỹ Năng Nghe",
-      description:
-        "Phát triển kỹ năng nghe hiểu tiếng Anh qua các bài tập và bài nghe thực tế.",
-      buttonText: "Bắt Đầu Luyện Ngay",
-      imageUrl: levelImage,
-    },
-    {
-      title: "Luyện Kỹ Năng Nghe",
-      description:
-        "Phát triển kỹ năng nghe hiểu tiếng Anh qua các bài tập và bài nghe thực tế.",
-      buttonText: "Bắt Đầu Luyện Ngay",
-      imageUrl: levelImage,
+      buttonText: "Tham Gia Ngay",
+      imageUrl: random4Image,
     },
   ];
+
+  const mapApiDataToCards = () => {
+    if (!courseRandom) return [];
+
+    return courseRandom.map((course, index) => ({
+      id: course.id,
+      title: course.name,
+      thumbnail: course.thumbnail,
+      description: course.description,
+      imageUrl: defaultCardData[index % defaultCardData.length].imageUrl,
+      buttonLabel: defaultCardData[index % defaultCardData.length].buttonText,
+    }));
+  };
+
+  const mappedCardData = mapApiDataToCards();
+
+  const handleDetail = (courseId: number) => {
+    if (!isAuthenticated) {
+      navigate("/login");
+    } else {
+      dispatch(enroll({ courseId }));
+      navigate(`/lesson/${courseId}`);
+    }
+  };
+
   return (
     <section>
       <h1 className="font-bold text-2xl text-center mt-20">
-        Bắt đầu chinh phục tiếng Anh cùng VOCA
+        Bắt đầu chinh phục tiếng Anh
       </h1>
       <div className="container mt-10 md:px-28">
         <Carousel
@@ -66,13 +92,14 @@ const Level = () => {
           className="w-full container"
         >
           <CarouselContent className="flex gap-0 pt-28">
-            {cardDataArray.map((data, index) => (
+            {mappedCardData.map((data, index) => (
               <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
                 <LevelCard
                   title={data.title}
                   description={data.description}
-                  buttonText={data.buttonText}
+                  buttonText={data.buttonLabel}
                   imageUrl={data.imageUrl}
+                  onClick={() => handleDetail(data.id)}
                 />
               </CarouselItem>
             ))}
